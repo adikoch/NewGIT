@@ -4,7 +4,7 @@ public class MainMenu {
 
     public void show()
     {
-
+    // test
         System.out.println("Hi,please choose one of the above:");
         System.out.println("1.Update username.");
         System.out.println("2.Import a repository from XML");
