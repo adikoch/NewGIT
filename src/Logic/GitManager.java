@@ -20,11 +20,6 @@ public class GitManager {
 
     }
 
-    public static void SwitchRepository()
-    {
-
-    }
-
     public static void ShowFilesOfCurrCommit()
     {
 
