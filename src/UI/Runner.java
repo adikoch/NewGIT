@@ -3,6 +3,8 @@ import Logic.GitManager;
 
 
 import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Scanner;
 
 public class Runner {
@@ -112,7 +114,13 @@ public class Runner {
     public void SwitchRepository()
     {
         System.out.println("Enter the new repository's path:");
-        String NewReposetory =  scanInput.nextLine();
+        String NewRepositoryPathString =  scanInput.nextLine();
+        Path NewRepositoryPath = Paths.get(NewRepositoryPathString);
+        try {manager.switchRepository(NewRepositoryPath);}
+        catch (Exception e)
+        {
+            System.out.println((""));
+        }
     }
 
 }

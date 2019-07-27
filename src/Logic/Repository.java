@@ -7,7 +7,6 @@ import java.util.List;
 public class Repository {
 
     Path path;
-    List<Commit> commits;
     LinkedList<Branch> branches;
     Commit headCommit;
 
@@ -17,9 +16,17 @@ public class Repository {
     String referenceNameLocation;
 
 
+
+
     public Repository(Path workingPath)
     {
         path = workingPath;
         branches = new LinkedList<Branch>();
+    }
+    //********** inbar
+
+    public void Switch(Path newPath)
+    {
+        path = newPath;
     }
 }

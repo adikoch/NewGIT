@@ -80,6 +80,19 @@ public class GitManager {
 
     }
 
+    public void switchRepository(Path newRepPath) throws Exception
+    {
+        Path checkIfMagit= Paths.get(newRepPath+"\\.magit");
+        if(Files.exists(newRepPath))
+        {
+            if(Files.exists(checkIfMagit))
+            GITRepository.Switch(newRepPath);
+            else throw new Exception();//exeption for not being magit
+
+        }
+        else throw new Exception();//exception for not existing
+    }
+
 
 
 }
