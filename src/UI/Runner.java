@@ -11,9 +11,9 @@ public class Runner {
 
     public void run() {
         MainMenu menu = new MainMenu();
-        while (true) {
+        int userInput = 0;
+        while (userInput != 13) {
             menu.show();
-            int userInput;
             try {
                 userInput = scanInput.nextInt();
                 sendToOption(userInput);
@@ -22,12 +22,12 @@ public class Runner {
             catch(IndexOutOfBoundsException ex)
             {
                 System.out.println("number out of bound!");
-                }
+            }
         }
     }
 
 
-    public void sendToOption(int userInput) {
+    private void sendToOption(int userInput) {
         switch (userInput)
         {
             case(1):
@@ -35,7 +35,7 @@ public class Runner {
                 break;
 
             case(2):
-                GitManager.ImportRepFromXML();//todo
+                GitManager.ImportRepFromXML();
                 break;
 
             case(3):
@@ -88,7 +88,7 @@ public class Runner {
 
 
     }
-    public void createEmptyRepository()
+    private void createEmptyRepository()
     {
 
         Scanner sc = new Scanner(System.in);
@@ -102,7 +102,7 @@ public class Runner {
             System.out.println(ex.getFile());
         }
     }
-     public void UpdateUsername()
+     private void UpdateUsername()
      {
          System.out.println("Enter the new username:");
          String NewUserName =  scanInput.nextLine();

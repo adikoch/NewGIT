@@ -1,12 +1,12 @@
 package Logic;
 
 public class Branch {
-    String master;
     Boolean isTracking;
     Boolean isRemote;
-    String branchName;
-    Integer pointedCommit;
 
+    private String branchName;
+    Boolean isMaster;
+    String pointedCommit;
     public Branch(String name)
     {
         branchName = name;
