@@ -39,7 +39,7 @@ public class Runner {
                 break;
 
             case(3):
-                GitManager.SwitchRepository();
+                SwitchRepository();
                 break;
 
             case(4):
@@ -108,5 +108,11 @@ public class Runner {
          String NewUserName =  scanInput.nextLine();
          manager.updateNewUserNameInLogic(NewUserName);
      }
+
+    public void SwitchRepository()
+    {
+        System.out.println("Enter the new repository's path:");
+        String NewReposetory =  scanInput.nextLine();
+    }
 
 }

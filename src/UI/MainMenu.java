@@ -20,6 +20,6 @@ public class MainMenu {
         System.out.println("12.Create empty repository");
         System.out.println("13.Exit");
 
-
+// מתחילה מהראנר כותבת את הפונק למטה ומבקשת את כל הדברים מהמשתמש ואז שולחת את זה לפונקציה של לוגיקה במנגר
     }
 }
