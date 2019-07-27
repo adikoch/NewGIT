@@ -88,14 +88,25 @@ public class Runner {
 
 
     }
+    private void CreatBranch () throws FileAlreadyExistsException
+    {
+        System.out.println("Enter the full name for the new branch: ");
+        String newBranchName = scanInput.nextLine();
+        try {
+            manager.CreateNewBranch(newBranchName);
+        }
+        catch (FileAlreadyExistsException ex)
+        {
+            System.out.println(ex.getMessage());
+        }
+    }
+
     private void createEmptyRepository()
     {
-
-        Scanner sc = new Scanner(System.in);
         System.out.println("Enter the full path for the new repository: ");
-        String repPath = sc.nextLine();
+        String repPath = scanInput.nextLine();
         System.out.println("Choose name for the new repository: ");
-        String repName = sc.nextLine();
+        String repName = scanInput.nextLine();
         try {
             manager.createEmptyRepositoryFolders(repPath,repName);
         } catch (FileAlreadyExistsException ex) {

@@ -6,7 +6,7 @@ public class Branch {
 
     private String branchName;
     Boolean isMaster;
-    String pointedCommit;
+    Commit pointedCommit;
     public Branch(String name)
     {
         branchName = name;

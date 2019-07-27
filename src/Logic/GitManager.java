@@ -15,37 +15,37 @@ public class GitManager {
         userName = NewUserName;
     }
 
-    public static void ImportRepFromXML()
+    public  void ImportRepFromXML()
     {
 
     }
 
-    public static void ShowFilesOfCurrCommit()
+    public void ShowFilesOfCurrCommit()
     {
 
     }
 
-    public static void ShowStatus()
+    public void ShowStatus()
     {
 
     }
 
-    public static void Commit()
+    public void Commit()
     {
 
     }
 
-    public static void ShowAllBranches()
+    public void ShowAllBranches()
     {
 
     }
 
-    public static void CreatBranch()
+    public  void CreatBranch()
     {
 
     }
 
-    public static void DeleteBranch()
+    public  void DeleteBranch()
     {
 
     }
@@ -81,5 +81,20 @@ public class GitManager {
     }
 
 
+    public void CreateNewBranch  (String newBranchName) throws FileAlreadyExistsException {
+        for (Branch X : GITRepository.branches) {
+            if (X.toString() == newBranchName) {
+                throw new FileAlreadyExistsException("This Branch is already exist!");
+            }
+            else
+            {
+                Branch newB = new Branch(newBranchName);
+                GITRepository.branches.add(newB);
+                newB.pointedCommit = GITRepository.headCommit;
 
+            }
+
+        }
+
+    }
 }
