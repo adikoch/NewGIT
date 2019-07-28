@@ -4,6 +4,8 @@ import Logic.GitManager;
 
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Scanner;
 
 public class Runner {
@@ -126,7 +128,13 @@ public class Runner {
     private void SwitchRepository()
     {
         System.out.println("Enter the new repository's path:");
-        String NewReposetory =  scanInput.nextLine();
+        String NewRepositoryPathString =  scanInput.nextLine();
+        Path NewRepositoryPath = Paths.get(NewRepositoryPathString);
+        try {manager.switchRepository(NewRepositoryPath);}
+        catch (Exception e)//there are two kindes possible: exception for not existing, exeption for not being magit, need to handle 2 of them
+        {
+            System.out.println((""));
+        }
     }
 
 }
