@@ -40,7 +40,7 @@ public class Folder {
 
     public String toString() //
     {
-
+        return "dsd";
     }
 
     public void exportToFile() // check if the sha1 exist

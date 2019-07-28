@@ -1,6 +1,6 @@
 package Logic;
 
-import java.io.File;
+import java.io.*;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -22,8 +22,7 @@ public class GitManager {
 
     }
 
-    public void updateNewUserNameInLogic(String NewUserName)
-    {
+
     public void updateNewUserNameInLogic(String NewUserName) {
         userName = NewUserName;
     }
@@ -73,7 +72,7 @@ public class GitManager {
 
     }
 
-    public void createEmptyRepositoryFolders(String repPath,String repName) throws FileAlreadyExistsException {
+    public void createEmptyRepositoryFolders(String repPath,String repName) throws IOException {
         Path workingPath;
         if (repPath.substring(repPath.length() - 1) != "/")
         {
@@ -154,7 +153,7 @@ public class GitManager {
             {
                 Branch newB = new Branch(newBranchName);
                 GITRepository.branches.add(newB);
-                newB.pointedCommit = GITRepository.headCommit;
+                newB.pointedCommit = GITRepository.head.pointedCommit;
 
             }
 
