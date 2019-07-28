@@ -2,6 +2,7 @@ package UI;
 import Logic.GitManager;
 
 
+import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.util.Scanner;
 
@@ -35,7 +36,7 @@ public class Runner {
                 break;
 
             case(2):
-                GitManager.ImportRepFromXML();
+                //ImportRepFromXML();
                 break;
 
             case(3):
@@ -43,35 +44,35 @@ public class Runner {
                 break;
 
             case(4):
-                GitManager.ShowFilesOfCurrCommit();
+                //ShowFilesOfCurrCommit();
                 break;
 
             case(5):
-                GitManager.ShowStatus();
+                //ShowStatus();
                 break;
 
             case(6):
-                GitManager.Commit();
+                //Commit();
                 break;
 
             case(7):
-                GitManager.ShowAllBranches();
+                //ShowAllBranches();
                 break;
 
             case(8):
-                GitManager.CreatBranch();
+                CreatBranch();
                 break;
 
             case(9):
-                GitManager.DeleteBranch();
+                //DeleteBranch();
                 break;
 
             case(10):
-                GitManager.CheckOut();
+                //CheckOut();
                 break;
 
             case(11):
-                GitManager.ShowHistoryOfActiveBranch();
+                //ShowHistoryOfActiveBranch();
                 break;
 
             case(12):
@@ -88,14 +89,14 @@ public class Runner {
 
 
     }
-    private void CreatBranch () throws FileAlreadyExistsException
+    private void CreatBranch ()
     {
         System.out.println("Enter the full name for the new branch: ");
         String newBranchName = scanInput.nextLine();
         try {
             manager.CreateNewBranch(newBranchName);
         }
-        catch (FileAlreadyExistsException ex)
+        catch (IOException ex)
         {
             System.out.println(ex.getMessage());
         }
@@ -103,14 +104,16 @@ public class Runner {
 
     private void createEmptyRepository()
     {
+        Scanner sc = new Scanner(System.in);
+
         System.out.println("Enter the full path for the new repository: ");
-        String repPath = scanInput.nextLine();
+        String repPath = sc.nextLine();
         System.out.println("Choose name for the new repository: ");
-        String repName = scanInput.nextLine();
+        String repName = sc.nextLine();
         try {
             manager.createEmptyRepositoryFolders(repPath,repName);
-        } catch (FileAlreadyExistsException ex) {
-            System.out.println(ex.getFile());
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
         }
     }
      private void UpdateUsername()
@@ -120,7 +123,7 @@ public class Runner {
          manager.updateNewUserNameInLogic(NewUserName);
      }
 
-    public void SwitchRepository()
+    private void SwitchRepository()
     {
         System.out.println("Enter the new repository's path:");
         String NewReposetory =  scanInput.nextLine();

@@ -8,7 +8,7 @@ public class Repository {
 
      Path path;
     LinkedList<Branch> branches;
-    Commit headCommit;
+    Branch headCommit;
 
     private String repositoryName;
     String repositoryLocation;
