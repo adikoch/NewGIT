@@ -10,8 +10,8 @@ public class Repository {
     private Path path;
     HashSet<Branch> branches;
     private Branch head;
-    //Commit headCommit;
 
+    //Commit headCommit;
     //private String repositoryName;
     //String repositoryLocation;
     //String remoteReferenceName;
@@ -25,7 +25,7 @@ public class Repository {
         path = workingPath;
         branches = new HashSet<Branch>();
     }
-    //********** inbar
+
 
     public void Switch(Path newPath)
     {
