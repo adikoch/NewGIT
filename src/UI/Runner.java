@@ -13,9 +13,9 @@ public class Runner {
 
     public void run() {
         MainMenu menu = new MainMenu();
-        while (true) {
+        int userInput = 0;
+        while (userInput != 13) {
             menu.show();
-            int userInput;
             try {
                 userInput = scanInput.nextInt();
                 sendToOption(userInput);
@@ -24,12 +24,12 @@ public class Runner {
             catch(IndexOutOfBoundsException ex)
             {
                 System.out.println("number out of bound!");
-                }
+            }
         }
     }
 
 
-    public void sendToOption(int userInput) {
+    private void sendToOption(int userInput) {
         switch (userInput)
         {
             case(1):
@@ -37,7 +37,7 @@ public class Runner {
                 break;
 
             case(2):
-                GitManager.ImportRepFromXML();//todo
+                GitManager.ImportRepFromXML();
                 break;
 
             case(3):
@@ -90,21 +90,32 @@ public class Runner {
 
 
     }
-    public void createEmptyRepository()
+    private void CreatBranch () throws FileAlreadyExistsException
     {
+        System.out.println("Enter the full name for the new branch: ");
+        String newBranchName = scanInput.nextLine();
+        try {
+            manager.CreateNewBranch(newBranchName);
+        }
+        catch (FileAlreadyExistsException ex)
+        {
+            System.out.println(ex.getMessage());
+        }
+    }
 
-        Scanner sc = new Scanner(System.in);
+    private void createEmptyRepository()
+    {
         System.out.println("Enter the full path for the new repository: ");
-        String repPath = sc.nextLine();
+        String repPath = scanInput.nextLine();
         System.out.println("Choose name for the new repository: ");
-        String repName = sc.nextLine();
+        String repName = scanInput.nextLine();
         try {
             manager.createEmptyRepositoryFolders(repPath,repName);
         } catch (FileAlreadyExistsException ex) {
             System.out.println(ex.getFile());
         }
     }
-     public void UpdateUsername()
+     private void UpdateUsername()
      {
          System.out.println("Enter the new username:");
          String NewUserName =  scanInput.nextLine();
@@ -117,7 +128,7 @@ public class Runner {
         String NewRepositoryPathString =  scanInput.nextLine();
         Path NewRepositoryPath = Paths.get(NewRepositoryPathString);
         try {manager.switchRepository(NewRepositoryPath);}
-        catch (Exception e)
+        catch (Exception e)//there are two kindes possible: exception for not existing, exeption for not being magit, need to handle 2 of them
         {
             System.out.println((""));
         }

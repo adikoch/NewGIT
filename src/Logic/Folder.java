@@ -1,25 +1,51 @@
 package Logic;
 
+import java.io.File;
 import java.util.Date;
 import java.util.List;
 
 public class Folder {
-    private  Integer folderID;
-    private String blobName;
-    private String shwa1;//content
-    private String lastUpdater;
-    private Date lastUpdateDate;
-    Enum folderType;
-    List<component> items;//sha1
-    Boolean isRoot;
+    //private  Integer folderID;
+    //private String blobName;
+    //private String sha1;//content
+    //private String lastUpdater;
+    //private Date lastUpdateDate;
+    //Enum folderType;
+    //List<component> items;//sha1
+    //Boolean isRoot;
+
+    private List<component> components;
+    private String SHA1;
+
+
 
     public class component
     {
-        FolderType type;
-        String Shw1;
-        String name;
-        String lastUpdater;
-        Date lastUpdateDate;
+        private FolderType type;
+        private String Sha1;
+        private String name;
+        private String lastUpdater;
+        private Date lastUpdateDate;
+    }
+
+    public Folder(File file) //creating by text file
+    {
+
+    }
+
+    public Folder(String XMLstr) // creating by XML
+    {
+
+    }
+
+    public String toString() //
+    {
+
+    }
+
+    public void exportToFile() // check if the sha1 exist
+    {
+
     }
 
 }

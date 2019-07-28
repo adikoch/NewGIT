@@ -1,19 +1,21 @@
 package Logic;
 
 import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
 public class Repository {
 
-    Path path;
-    LinkedList<Branch> branches;
-    Commit headCommit;
+    private Path path;
+    HashSet<Branch> branches;
+    private Branch head;
+    //Commit headCommit;
 
-    private String repositoryName;
-    String repositoryLocation;
-    String remoteReferenceName;
-    String referenceNameLocation;
+    //private String repositoryName;
+    //String repositoryLocation;
+    //String remoteReferenceName;
+    //String referenceNameLocation;
 
 
 
@@ -21,7 +23,7 @@ public class Repository {
     public Repository(Path workingPath)
     {
         path = workingPath;
-        branches = new LinkedList<Branch>();
+        branches = new HashSet<Branch>();
     }
     //********** inbar
 
