@@ -4,7 +4,7 @@ public class Branch {
     Boolean isTracking;
     Boolean isRemote;
 
-    private String branchName;
+    String branchName;
     Boolean isMaster;
     Commit pointedCommit;
 
@@ -22,4 +22,5 @@ public class Branch {
     //is remote true
 //    String branchName;
 //    Integer pointedCommit;
+
 }

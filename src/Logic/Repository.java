@@ -34,4 +34,14 @@ public class Repository {
     {
 
     }
+    public Branch setBranchByName(String name)
+    {
+        Branch newBranch = null;
+        for(Branch b:branches) {
+            if (b.branchName.equals(name))
+                newBranch = b;
+        }
+            return newBranch;
+
+    }
 }

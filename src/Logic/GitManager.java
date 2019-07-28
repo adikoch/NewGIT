@@ -74,6 +74,8 @@ public class GitManager {
 
     public void createEmptyRepositoryFolders(String repPath,String repName) throws IOException {
         Path workingPath;
+        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        Date date = new Date();
         if (repPath.substring(repPath.length() - 1) != "/")
         {
             repPath += "\\";
@@ -88,6 +90,7 @@ public class GitManager {
         this.GITRepository = (new Repository(workingPath));
         GITRepository.path = Paths.get(repPath + repName);
         GITRepository.branches.add(new Branch("Master"));
+        GITRepository.head.pointedCommit = new Commit();
 
 //create branch file
         File head = new File( repPath + repName + "\\.magit\\branches\\head.txt");
@@ -108,18 +111,23 @@ public class GitManager {
 
         File headCommit = new File( repPath + repName + "\\.magit\\objects\\headcommit.txt");
         try {
-            DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-            Date date = new Date();
+            String content = "Shwa1 of repository" +
+                    "StartOfMachine" +
+                    "Date" +
+                    userName +
+                    "\r\n";
+
+            out = null;
             out = new BufferedWriter(
                     new OutputStreamWriter(
                             new FileOutputStream(headCommit)));
-            out.write("Shwa1 of repository" +
-                    "StartOfMachine" +
-            dateFormat.format(date) +
-                            userName +
-            "\r\n");
+            out.write(content);
+            String  sha1 = org.apache.commons.codec.digest.DigestUtils.sha1Hex( content );
+            GITRepository.setBranchByName("Master").pointedCommit = GITRepository.head.pointedCommit;
+
+
         } finally {
-            if (out.equals(null)) {
+            if (out != (null)) {
                 try {
                     out.close();
                 } catch (IOException ignored) {
