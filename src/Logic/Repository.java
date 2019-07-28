@@ -7,9 +7,9 @@ import java.util.List;
 
 public class Repository {
 
-    private Path path;
+    Path path;
     HashSet<Branch> branches;
-    private Branch head;
+    Branch head;
     //Commit headCommit;
 
     //private String repositoryName;
@@ -28,5 +28,10 @@ public class Repository {
     {
         path = workingPath;
         branches = new HashSet<>();
+    }
+
+    public void Switch(Path path)
+    {
+
     }
 }
