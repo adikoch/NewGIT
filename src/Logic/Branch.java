@@ -4,14 +4,24 @@ public class Branch {
     Boolean isTracking;
     Boolean isRemote;
 
-    String branchName;
-    Boolean isMaster;
+   private String branchName;
+    private Boolean isMaster;
     Commit pointedCommit;
 
     public Branch(String name)
     {
         branchName = name;
 
+    }
+
+    public String getBranchName()
+    {
+        return branchName;
+    }
+
+    public Commit getPointedCommit()
+    {
+        return pointedCommit;
     }
 
     //  tracking true

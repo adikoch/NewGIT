@@ -4,12 +4,14 @@ import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class Repository {
 
     Path path;
     HashSet<Branch> branches;
     Branch head;
+    Map objects;
     //Commit headCommit;
 
     //private String repositoryName;
@@ -24,10 +26,12 @@ public class Repository {
     String referenceNameLocation;
 
 
-    public Repository(Path workingPath)
+    public Repository(Path workingPath, Branch headBranch)
     {
         path = workingPath;
         branches = new HashSet<>();
+        branches.add(headBranch);
+        head = headBranch;
     }
 
     public void Switch(Path path)
@@ -38,7 +42,7 @@ public class Repository {
     {
         Branch newBranch = null;
         for(Branch b:branches) {
-            if (b.branchName.equals(name))
+            if (b.getBranchName().equals(name))
                 newBranch = b;
         }
             return newBranch;

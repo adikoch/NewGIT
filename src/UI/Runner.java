@@ -93,13 +93,16 @@ public class Runner {
     }
     private void CreatBranch ()
     {
+        Scanner sc = new Scanner(System.in);
+
         System.out.println("Enter the full name for the new branch: ");
-        String newBranchName = scanInput.nextLine();
+        String newBranchName = sc.nextLine();
         try {
             manager.CreateNewBranch(newBranchName);
         }
         catch (IOException ex)
         {
+
             System.out.println(ex.getMessage());
         }
     }
