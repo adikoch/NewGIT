@@ -7,11 +7,11 @@ import java.util.List;
 
 public class Repository {
 
-    private Path path;
+    Path path;
     HashSet<Branch> branches;
-    private Branch head;
-
+    Branch head;
     //Commit headCommit;
+
     //private String repositoryName;
     //String repositoryLocation;
     //String remoteReferenceName;
@@ -25,7 +25,7 @@ public class Repository {
         path = workingPath;
         branches = new HashSet<Branch>();
     }
-
+    //********** inbar
 
     public void Switch(Path newPath)
     {

@@ -1,10 +1,13 @@
 package Logic;
 
-import java.io.File;
+import java.io.*;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 public class GitManager {
@@ -19,8 +22,8 @@ public class GitManager {
 
     }
 
-    public void updateNewUserNameInLogic(String NewUserName)
-    {
+
+    public void updateNewUserNameInLogic(String NewUserName) {
         userName = NewUserName;
     }
 
@@ -69,7 +72,7 @@ public class GitManager {
 
     }
 
-    public void createEmptyRepositoryFolders(String repPath,String repName) throws FileAlreadyExistsException {
+    public void createEmptyRepositoryFolders(String repPath,String repName) throws IOException {
         Path workingPath;
         if (repPath.substring(repPath.length() - 1) != "/")
         {
@@ -86,10 +89,48 @@ public class GitManager {
         GITRepository.path = Paths.get(repPath + repName);
         GITRepository.branches.add(new Branch("Master"));
 
+//create branch file
+        File head = new File( repPath + repName + "\\.magit\\branches\\head.txt");
+        Writer out = null;
+        try {
+            out = new BufferedWriter(
+                    new OutputStreamWriter(
+                            new FileOutputStream(head)));
+            out.write("there need to be a shha1 here of the head\r\n");
+        } finally {
+            if (out != null) {
+                try {
+                    out.close();
+                } catch (IOException ignored) {
+                }
+            }
+        }
+
+        File headCommit = new File( repPath + repName + "\\.magit\\objects\\headcommit.txt");
+        try {
+            DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            Date date = new Date();
+            out = new BufferedWriter(
+                    new OutputStreamWriter(
+                            new FileOutputStream(headCommit)));
+            out.write("Shwa1 of repository" +
+                    "StartOfMachine" +
+            dateFormat.format(date) +
+                            userName +
+            "\r\n");
+        } finally {
+            if (out.equals(null)) {
+                try {
+                    out.close();
+                } catch (IOException ignored) {
+                }
+            }
+        }
+
 
     }
 
-/*
+
     public void switchRepository(Path newRepPath) throws Exception
     {
         Path checkIfMagit= Paths.get(newRepPath+"\\.magit");
@@ -100,19 +141,9 @@ public class GitManager {
             else throw new Exception("not magit");//exeption for not being magit
 
         }
-        else throw new Exception("");//exception for not existing
+        else throw new IllegalArgumentException("");//exception for not existing
     }
-*/
 
-    public void switchRepository(Path newRepPath)
-    {
-        Path checkIfMagit= Paths.get(newRepPath+"\\.magit");
-        if(Files.exists(newRepPath))
-        {
-            if(Files.exists(checkIfMagit))
-                GITRepository.Switch(newRepPath);
-        }
-    }
 
     public void CreateNewBranch  (String newBranchName) throws FileAlreadyExistsException {
         for (Branch X : GITRepository.branches) {
@@ -123,7 +154,7 @@ public class GitManager {
             {
                 Branch newB = new Branch(newBranchName);
                 GITRepository.branches.add(newB);
-                newB.pointedCommit = GITRepository.headCommit;
+                newB.pointedCommit = GITRepository.head.pointedCommit;
 
             }
 
