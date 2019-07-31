@@ -25,6 +25,9 @@ public class GitManager {
         private List<Path> deletedFiles;
 
     }
+    public Repository getGITRepository() {return GITRepository;}
+    public String getUserName() {return userName;}
+
 
     public static String generateSHA1FromFile(File file) {
         String str = file.toString();
@@ -50,17 +53,14 @@ public class GitManager {
 
     public void ShowStatus() {
 
+
     }
 
     public void Commit() {
 
     }
 
-    public void ShowAllBranches() {
-
-    }
-
-    public void CreatBranch() {
+     public void CreatBranch() {
 
     }
 
@@ -85,16 +85,14 @@ public class GitManager {
             new File(repPath + repName + "\\.magit\\branches").mkdirs();
             Path workingPath = Paths.get(repPath + repName + "\\");
             this.GITRepository = (new Repository(workingPath, new Branch("Master")));
-            GITRepository.head.pointedCommit = new Commit();
+            GITRepository.getHeadBranch().pointedCommit = new Commit();
 
 //Create commit file
-            createFileInMagit(GITRepository.head.pointedCommit, workingPath);
-            createFileInMagit(GITRepository.head, workingPath);
+            createFileInMagit(GITRepository.getHeadBranch().pointedCommit, workingPath);
+            createFileInMagit(GITRepository.getHeadBranch(), workingPath);
             createFile("Head", "Master", Paths.get(repPath + repName + "\\.magit\\branches"));
 
-            GITRepository.setBranchByName("Master").pointedCommit = GITRepository.head.getPointedCommit();
-
-
+            GITRepository.setBranchByName("Master").pointedCommit = GITRepository.getHeadBranch().getPointedCommit();
         }
 
     }
@@ -114,14 +112,13 @@ public class GitManager {
 
 
     public void CreateNewBranch(String newBranchName) throws FileAlreadyExistsException {
-        for (Branch X : GITRepository.branches) {
-            if (X.toString() == newBranchName) {
+        for (Branch X : GITRepository.getBranches()) {
+            if (X.getBranchName() == newBranchName) {
                 throw new FileAlreadyExistsException("This Branch is already exist!");
             } else {
                 Branch newB = new Branch(newBranchName);
-                GITRepository.branches.add(newB);
-                newB.pointedCommit = GITRepository.head.pointedCommit;
-
+                GITRepository.getBranches().add(newB);
+                newB.pointedCommit = GITRepository.getHeadBranch().pointedCommit;
             }
 
         }

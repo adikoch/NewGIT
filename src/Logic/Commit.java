@@ -26,6 +26,8 @@ public class Commit {
         changer = "Administrator";
         //GitManager.generateSHA1FromString(this.getCommitFileContent());
     }
+
+    public String getDescription (){return description;}
     public String getCommitFileContent() {
         String delimiter = ", ";
         StringBuilder sb = new StringBuilder();
