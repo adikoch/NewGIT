@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import static java.lang.System.out;
+
 public class GitManager {
     private Repository GITRepository;
     private String userName;
@@ -81,74 +83,23 @@ public class GitManager {
         if (!Files.exists(Paths.get(repPath + repName))) {
             new File(repPath + repName + "\\.magit\\objects").mkdirs();
             new File(repPath + repName + "\\.magit\\branches").mkdirs();
-            Path workingPath = Paths.get(repPath + repName);
+            Path workingPath = Paths.get(repPath + repName + "\\");
             this.GITRepository = (new Repository(workingPath, new Branch("Master")));
             GITRepository.head.pointedCommit = new Commit();
 
 //Create commit file
-
-            File headCommit = new File(repPath + repName + "\\.magit\\objects\\" + GITRepository.head.pointedCommit.getSHA() + ".txt");
-            Writer out = null;
-
-            try {
-                out = new BufferedWriter(
-                        new OutputStreamWriter(
-                                new FileOutputStream(headCommit)));
-                out.write(GITRepository.head.getPointedCommit().getCommitFileContent());
-            } finally {
-                if (out != (null)) {
-                    try {
-                        out.close();
-                    } catch (IOException ignored) {
-                    }
-                }
-            }
-
-//create branch file
-
-
-                File head = new File(repPath + repName + "\\.magit\\branches\\head.txt");
-            try {
-                out = null;
-
-                out = new BufferedWriter(
-                        new OutputStreamWriter(
-                                new FileOutputStream(head)));
-                out.write("Master");
-            } finally {
-                if (out != null) {
-                    try {
-                        out.close();
-                    } catch (IOException ignored) {
-                    }
-                } else throw new FileAlreadyExistsException("Error! This file already exist\n" + repPath + repName);
-
-            }
+            createFileInMagit(GITRepository.head.pointedCommit, workingPath);
+            createFileInMagit(GITRepository.head, workingPath);
+            createFile("Head", "Master", Paths.get(repPath + repName + "\\.magit\\branches"));
 
             GITRepository.setBranchByName("Master").pointedCommit = GITRepository.head.getPointedCommit();
-            createFileInMagit(GITRepository.head, Paths.get(repPath + repName));
-//
-//            File master = new File(repPath + repName + "\\.magit\\branches\\Master.txt");
-//            try {
-//                out = null;
-//
-//                out = new BufferedWriter(
-//                        new OutputStreamWriter(
-//                                new FileOutputStream(master)));
-//                out.write(GITRepository.head.getPointedCommit().getSHA());
-//            } finally {
-//                if (out != null) {
-//                    try {
-//                        out.close();
-//                    } catch (IOException ignored) {
-//                    }
-//                } else throw new FileAlreadyExistsException("Error! This file already exist\n" + repPath + repName);
-//
-//            }
+
 
         }
 
     }
+
+
 
 
     public void switchRepository(Path newRepPath) throws Exception {
@@ -179,9 +130,9 @@ public class GitManager {
 
     public static void createFileInMagit(Object obj, Path path) throws IOException {
         Class objClass = obj.getClass();
-        path = Paths.get(path.toString(), ".magit");
-        Path objectsPath = Paths.get(path.toString(), "objects");
-        Path branchesPath = Paths.get(path.toString(), "branches");
+        Path magitPath = Paths.get(path.toString()+ "\\.magit");
+        Path objectsPath = Paths.get(magitPath.toString()+ "\\objects");
+        Path branchesPath = Paths.get(magitPath.toString()+"\\branches");
 
         if (Commit.class.equals(obj.getClass())) {
             createCommitZip((Commit)obj, objectsPath);
