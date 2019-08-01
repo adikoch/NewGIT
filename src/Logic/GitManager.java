@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import static java.lang.System.out;
+
 public class GitManager {
     private Repository GITRepository;
     private String userName;
@@ -23,6 +25,9 @@ public class GitManager {
         private List<Path> deletedFiles;
 
     }
+    public Repository getGITRepository() {return GITRepository;}
+    public String getUserName() {return userName;}
+
 
     public static String generateSHA1FromFile(File file) {
         String str = file.toString();
@@ -48,17 +53,14 @@ public class GitManager {
 
     public void ShowStatus() {
 
+
     }
 
     public void Commit() {
 
     }
 
-    public void ShowAllBranches() {
-
-    }
-
-    public void CreatBranch() {
+     public void CreatBranch() {
 
     }
 
@@ -81,96 +83,73 @@ public class GitManager {
         if (!Files.exists(Paths.get(repPath + repName))) {
             new File(repPath + repName + "\\.magit\\objects").mkdirs();
             new File(repPath + repName + "\\.magit\\branches").mkdirs();
-            Path workingPath = Paths.get(repPath + repName);
+            Path workingPath = Paths.get(repPath + repName + "\\");
             this.GITRepository = (new Repository(workingPath, new Branch("Master")));
-            GITRepository.head.pointedCommit = new Commit();
+            GITRepository.getHeadBranch().pointedCommit = new Commit();
 
 //Create commit file
+            createFileInMagit(GITRepository.getHeadBranch().pointedCommit, workingPath);
+            createFileInMagit(GITRepository.getHeadBranch(), workingPath);
+            createFile("Head", "Master", Paths.get(repPath + repName + "\\.magit\\branches"));
 
-            File headCommit = new File(repPath + repName + "\\.magit\\objects\\" + GITRepository.head.pointedCommit.getSHA() + ".txt");
-            Writer out = null;
-
-            try {
-                out = new BufferedWriter(
-                        new OutputStreamWriter(
-                                new FileOutputStream(headCommit)));
-                out.write(GITRepository.head.getPointedCommit().getCommitFileContent());
-            } finally {
-                if (out != (null)) {
-                    try {
-                        out.close();
-                    } catch (IOException ignored) {
-                    }
-                }
-            }
-
-//create branch file
-
-
-                File head = new File(repPath + repName + "\\.magit\\branches\\head.txt");
-            try {
-                out = null;
-
-                out = new BufferedWriter(
-                        new OutputStreamWriter(
-                                new FileOutputStream(head)));
-                out.write("Master");
-            } finally {
-                if (out != null) {
-                    try {
-                        out.close();
-                    } catch (IOException ignored) {
-                    }
-                } else throw new FileAlreadyExistsException("Error! This file already exist\n" + repPath + repName);
-
-            }
-
-            GITRepository.setBranchByName("Master").pointedCommit = GITRepository.head.getPointedCommit();
-            createFileInMagit(GITRepository.head, Paths.get(repPath + repName));
-//
-//            File master = new File(repPath + repName + "\\.magit\\branches\\Master.txt");
-//            try {
-//                out = null;
-//
-//                out = new BufferedWriter(
-//                        new OutputStreamWriter(
-//                                new FileOutputStream(master)));
-//                out.write(GITRepository.head.getPointedCommit().getSHA());
-//            } finally {
-//                if (out != null) {
-//                    try {
-//                        out.close();
-//                    } catch (IOException ignored) {
-//                    }
-//                } else throw new FileAlreadyExistsException("Error! This file already exist\n" + repPath + repName);
-//
-//            }
-
+            GITRepository.setBranchByName("Master").pointedCommit = GITRepository.getHeadBranch().getPointedCommit();
         }
 
     }
+
+
 
 
     public void switchRepository(Path newRepPath) throws Exception {
         Path checkIfMagit = Paths.get(newRepPath + "\\.magit");
         if (Files.exists(newRepPath)) {
             if (Files.exists(checkIfMagit))
-                GITRepository.Switch(newRepPath);
+            {
+                File f=Paths.get(newRepPath.toString() + "\\.magit\\branches\\Head").toFile();
+                String content= "";
+                content=readTextFile(f.getName());
+                String Sha1;
+
+                this.GITRepository=new Repository(newRepPath,);
+                //GITRepository.Switch(newRepPath);
+            }
             else throw new Exception();//exeption for not being magit
 
         } else throw new Exception();//exception for not existing
     }
 
+    public String readTextFile(String fileName) {
+        String returnValue = "";
+        FileReader file;
+        String line = "";
+        try {
+            file = new FileReader(fileName);
+            BufferedReader reader = new BufferedReader(file);
+            try {
+                while ((line = reader.readLine()) != null) {
+                    returnValue += line + "\r\n";
+                }
+            } finally {
+                reader.close();
+            }
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException("File not found");
+        } catch (IOException e) {
+            throw new RuntimeException("IO Error occured");
+        }
+        return returnValue;
+    }
+
+
 
     public void CreateNewBranch(String newBranchName) throws FileAlreadyExistsException {
-        for (Branch X : GITRepository.branches) {
-            if (X.toString() == newBranchName) {
+        for (Branch X : GITRepository.getBranches()) {
+            if (X.getBranchName() == newBranchName) {
                 throw new FileAlreadyExistsException("This Branch is already exist!");
             } else {
                 Branch newB = new Branch(newBranchName);
-                GITRepository.branches.add(newB);
-                newB.pointedCommit = GITRepository.head.pointedCommit;
-
+                GITRepository.getBranches().add(newB);
+                newB.pointedCommit = GITRepository.getHeadBranch().pointedCommit;
             }
 
         }
@@ -179,9 +158,9 @@ public class GitManager {
 
     public static void createFileInMagit(Object obj, Path path) throws IOException {
         Class objClass = obj.getClass();
-        path = Paths.get(path.toString(), ".magit");
-        Path objectsPath = Paths.get(path.toString(), "objects");
-        Path branchesPath = Paths.get(path.toString(), "branches");
+        Path magitPath = Paths.get(path.toString()+ "\\.magit");
+        Path objectsPath = Paths.get(magitPath.toString()+ "\\objects");
+        Path branchesPath = Paths.get(magitPath.toString()+"\\branches");
 
         if (Commit.class.equals(obj.getClass())) {
             createCommitZip((Commit)obj, objectsPath);

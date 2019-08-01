@@ -1,5 +1,7 @@
 package Logic;
 
+import UI.Runner;
+
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -10,9 +12,13 @@ public class Commit {
     //private String SHA1;
     private Folder treeRoot;
     private LinkedList<String> SHA1PreveiousCommit;
+
     private String description;
     private String creationDate;
     private String changer;
+
+    //inbar:
+    private String Sha1PrevCommit;
 
 
     public Commit()
@@ -24,15 +30,36 @@ public class Commit {
         description = "Start The Machine";
         creationDate = dateFormat.format(date);
         changer = "Administrator";
-        GitManager.generateSHA1FromString(this.getCommitFileContent());
+        //GitManager.generateSHA1FromString(this.getCommitFileContent());
     }
+
+    public Commit(String usersDescription, GitManager manager)
+    {
+        //ask for: , , , prevCommit, head branch update
+        description=usersDescription;
+
+        //Date
+        DateFormat dateFormat = new SimpleDateFormat("dd.MM.YYYY - hh:mm:ss:sss");
+        Date date = new Date();
+        creationDate = dateFormat.format(date);
+        changer= manager.getUserName();
+        //SHA1PreveiousCommit=
+        //רוצה ללכת לקובץ head שנמצא בתוך .magit.Branches ולשנות את התוכן בו לשם הבראנצ הזה
+
+
+
+        //prev Commit
+
+    }
+
+    public String getDescription (){return description;}
     public String getCommitFileContent() {
         String delimiter = ", ";
         StringBuilder sb = new StringBuilder();
 
         sb.append(GitManager.generateSHA1FromString(treeRoot.getFolderContentString()));
         sb.append(System.lineSeparator());
-        sb.append(getPreviousCommitsSHAs(delimiter));
+        sb.append(getPreviousCommitsSHAs(","));
         sb.append(System.lineSeparator());
         sb.append(description);
         sb.append(System.lineSeparator());
@@ -52,15 +79,13 @@ public class Commit {
             sb.append(sha);
             sb.append(delimiter);
         }
-        sb.delete(sb.length()-delimiter.length()-1, sb.length()-1);
+        if(SHA1PreveiousCommit.size() != 0) {
+            sb.delete(sb.length() - delimiter.length() - 1, sb.length() - 1);
+        }
 
         return sb.toString();
     }
 
-public Commit(String comment)
-{
-
-}
 
     public Commit(File file)
     {
