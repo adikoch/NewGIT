@@ -10,12 +10,12 @@ import java.util.LinkedList;
 
 public class Commit {
     //private String SHA1;
-    private Folder treeRoot;
+    private Folder treeRoot;// main library
     private LinkedList<String> SHA1PreveiousCommit;
-
     private String description;
     private String creationDate;
     private String changer;
+
 
     //inbar:
     private String Sha1PrevCommit;

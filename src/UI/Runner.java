@@ -18,7 +18,7 @@ import static java.lang.System.out;
 public class Runner {
     private Scanner scanInput = new Scanner(System.in);
     private GitManager manager = new GitManager();
-    private LinkedList<Commit> CommitsList= new LinkedList<>();
+    //private LinkedList<Commit> CommitsList= new LinkedList<>();
 
 
     public void run() {
@@ -101,8 +101,9 @@ public class Runner {
         System.out.println("Please enter description for the commit");
         Scanner sc= new Scanner(System.in);
         String description= sc.nextLine();
-        Commit newCommit= new Commit(description, manager);
-        CommitsList.add((newCommit));
+        manager.ExecuteCommit(description);
+        //CommitsList.add((newCommit));
+
     }
 
     private void CreatBranch() {

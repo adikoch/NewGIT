@@ -1,6 +1,8 @@
 package Logic;
 
 
+import org.apache.commons.codec.digest.DigestUtils;
+
 import java.io.*;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
@@ -8,6 +10,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -24,7 +27,6 @@ public class GitManager {
         private List<Path> updatedFiles;
         private List<Path> createdFiles;
         private List<Path> deletedFiles;
-
     }
 
     public Repository getGITRepository() {
@@ -63,9 +65,39 @@ public class GitManager {
 
     }
 
-    public void Commit() {
+    public void ExecuteCommit(String description) {
 
 
+    }
+
+    private String Sh1Directory(Folder currentFolder,Path currentPath, String dateModified) {
+        File[] allFileComponents = currentPath.toFile().listFiles();
+        String sh1Hex = "";
+        String fileContent = "";
+
+        for (File f : allFileComponents) {
+            if (!f.getName().equals(".magit")) {
+                if (!f.isDirectory()) {
+                    fileContent = readTextFile(f.toString());
+                    sh1Hex = DigestUtils.sha1Hex(fileContent);
+                    if (!Files.exists(Paths.get(currentPath.toString() + f.getName()))) {//if a file with the given sh1 does not exist
+                        currentFolder.getComponents().add(new Folder.Component(f.getName(), sh1Hex, "Blob", userName, dateModified));
+                        //createNewObjectFile(sh1Hex,fileContent);
+                    }
+                } else {
+                    if (!Files.exists(Paths.get(currentPath.toString() + f.getName()))){//if a folder with the given sh1 does not exist)
+                        Folder folder = new Folder();
+                        sh1Hex = Sh1Directory(folder,Paths.get(f.getPath()), dateModified);
+                        currentFolder.getComponents().add(new Folder.Component(
+                                f.getName(), sh1Hex, "FOLDER", userName, dateModified));
+                    }
+                }
+            }
+        }
+
+        Collections.sort(currentFolder.getComponents());
+        System.out.println(currentFolder.toString());
+        return DigestUtils.sha1Hex(currentFolder.toString());
     }
 
     public void CreatBranch() {
@@ -243,3 +275,41 @@ public class GitManager {
 
 
 
+
+
+
+
+
+
+
+// הפונקציה של ניהול הקבצים רקורסיבית
+//מקבלת
+// (תאריך,תיקייה במובן המוחשי,תיקייה במובן הלוגי)
+/*
+private String Sh1Directory(Folder currentFolder,Path currentPath, String dateModified) {
+        File[] allFileComponents = currentPath.toFile().listFiles();
+        String sh1Hex = "";
+        String fileContent = "";
+        //Folder currentFolder = new Folder();
+
+        for (File f : allFileComponents) {
+            if (!f.getName().equals(".magit")) {
+                if (!f.isDirectory()) {
+                    fileContent = readTextFile(f.toString());
+                    sh1Hex = DigestUtils.sha1Hex(fileContent);
+                    if (!Files.exists(Paths.get(currentPath.toString() + f.getName()))) {//if a file with the given sh1 does not exist
+                        currentFolder.getComponents().add(new Folder.FolderComponent(
+                                f.getName(), sh1Hex, "BLOB", username, dateModified));
+                        createNewObjectFile(sh1Hex,fileContent);
+                    }
+                } else {
+                    if (!Files.exists(Paths.get(currentPath.toString() + f.getName()))){//if a folder with the given sh1 does not exist)
+                        Folder folder = new Folder();
+                        sh1Hex = Sh1Directory(folder,Paths.get(f.getPath()), dateModified);
+                        currentFolder.getComponents().add(new Folder.FolderComponent(
+                                f.getName(), sh1Hex, "FOLDER", username, dateModified));
+                    }
+                }
+            }
+        }
+ */

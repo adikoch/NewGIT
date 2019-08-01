@@ -15,19 +15,33 @@ public class Folder {
     //List<component> items;//sha1
     //Boolean isRoot;
 
-    private LinkedList<Component> components;
+    private List<Component> components;
     //private String SHA1;
 
 
-    public class Component {
+    protected static class Component implements Comparable<Component>{
         private FolderType type;
         private String Sha1;
         private String name;
         private String lastUpdater;
         private String lastUpdateDate;
 
-        private Component(String component){}       // from text/xml file
+        public Component(String name, String sha1, String type, String lastUpdater, String lastUpdateDate){
+
+            this.type=FolderType.valueOf(type);
+            this.name=name;
+            this.lastUpdateDate=lastUpdateDate;
+            this.Sha1=sha1;
+            this.lastUpdater=lastUpdater;
+
+        }       // from text/xml file
         public void Compnenet() {}
+
+        //comperator
+        public int compareTo(Component folderComponent) {
+            return this.name.compareTo(folderComponent.name);
+        }
+
 
 
         public String getComponentsString() {
@@ -81,7 +95,7 @@ public class Folder {
 
     }
 
-    public LinkedList<Component> getComponents() {
+    public List<Component> getComponents() {
         return this.components;
     }
 
