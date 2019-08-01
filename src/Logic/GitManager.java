@@ -10,10 +10,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -66,37 +63,69 @@ public class GitManager {
     }
 
     public void ExecuteCommit(String description) {
-
-
+        Path ObjectPath= Paths.get(GITRepository.getRepositoryPath().toString()+"/.magit/Objects");
+        Path BranchesPath= Paths.get(GITRepository.getRepositoryPath().toString()+"/.magit/Branches");
+        String headBranch = readTextFile(BranchesPath+"/Head");
+        String prevCommitSha1 = readTextFile(BranchesPath+"/"+headBranch);
+        Commit newCommit= new Commit();
+        //Date
+        DateFormat dateFormat = new SimpleDateFormat("dd.MM.YYYY - hh:mm:ss:sss");
+        Date date = new Date();
+        String creationDate = dateFormat.format(date);
+        Folder folder=new Folder();
+        String treeRootSha1= Sh1Directory(folder,GITRepository.getRepositoryPath(),creationDate);
+        try {
+            createFolderZip(folder,ObjectPath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        newCommit.setSHA1PreveiousCommit(prevCommitSha1);
+        try {
+            createCommitZip(newCommit,ObjectPath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private String Sh1Directory(Folder currentFolder,Path currentPath, String dateModified) {
         File[] allFileComponents = currentPath.toFile().listFiles();
         String sh1Hex = "";
         String fileContent = "";
+        String objectsPath= currentPath+"\\Objects";
 
         for (File f : allFileComponents) {
             if (!f.getName().equals(".magit")) {
                 if (!f.isDirectory()) {
                     fileContent = readTextFile(f.toString());
                     sh1Hex = DigestUtils.sha1Hex(fileContent);
-                    if (!Files.exists(Paths.get(currentPath.toString() + f.getName()))) {//if a file with the given sh1 does not exist
-                        currentFolder.getComponents().add(new Folder.Component(f.getName(), sh1Hex, "Blob", userName, dateModified));
-                        //createNewObjectFile(sh1Hex,fileContent);
+                    currentFolder.getComponents().add(new Folder.Component(f.getName(), sh1Hex, "Blob", userName, dateModified));
+                    //כאן יהיה if שבודק
+                    /*try {
+                        createBlobZip(new Blob(fileContent), currentPath);
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
+                     */
                 } else {
-                    if (!Files.exists(Paths.get(currentPath.toString() + f.getName()))){//if a folder with the given sh1 does not exist)
-                        Folder folder = new Folder();
-                        sh1Hex = Sh1Directory(folder,Paths.get(f.getPath()), dateModified);
-                        currentFolder.getComponents().add(new Folder.Component(
-                                f.getName(), sh1Hex, "FOLDER", userName, dateModified));
-                    }
+                    Folder folder = new Folder();
+                    sh1Hex = Sh1Directory(folder, Paths.get(f.getPath()), dateModified);
+                    currentFolder.getComponents().add(new Folder.Component(
+                            f.getName(), sh1Hex, "FOLDER", userName, dateModified));
+
+                    /*try {
+                        createFolderZip(folder, Paths.get(objectsPath));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }*/
+                    //נעשה את החלק הזה במקרה שבו התיקייה או הקובץ השתנו (התעדכנה או נוספה)
                 }
             }
         }
 
+
+
         Collections.sort(currentFolder.getComponents());
-        System.out.println(currentFolder.toString());
+
         return DigestUtils.sha1Hex(currentFolder.toString());
     }
 
@@ -128,6 +157,7 @@ public class GitManager {
             GITRepository.getHeadBranch().pointedCommit = new Commit();
 
 //Create commit file
+
             createFileInMagit(GITRepository.getHeadBranch().pointedCommit, workingPath);
             createFileInMagit(GITRepository.getHeadBranch(), workingPath);
             createFile("Head", "Master", Paths.get(repPath + repName + "\\.magit\\branches"));

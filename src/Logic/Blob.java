@@ -16,6 +16,12 @@ public class  Blob {
     {
 
     }
+
+    public Blob(String Content)
+    {
+        this.content=Content;
+    }
+
     public String getContent()
     {
         return content;
