@@ -68,7 +68,7 @@ public class Runner {
                 break;
 
             case (9):
-                //DeleteBranch();
+                DeleteBranch();
                 break;
 
             case (10):
@@ -135,8 +135,10 @@ public class Runner {
     }
 
     private void SwitchRepository() {
+        Scanner sb = new Scanner(System.in);
+
         System.out.println("Enter the new repository's path:");
-        String NewRepositoryPathString = scanInput.nextLine();
+        String NewRepositoryPathString = sb.nextLine();
         Path NewRepositoryPath = Paths.get(NewRepositoryPathString);
         try {
             manager.switchRepository(NewRepositoryPath);
@@ -174,6 +176,16 @@ public class Runner {
         } else {
             out.println("The is no repository defined!");
         }
+
+    }
+    public  void DeleteBranch()
+    {
+        Scanner sc = new Scanner(System.in);
+
+        out.println("Please enter the name of the branch you would like to delete");
+        String branchName = sc.nextLine();
+
+        manager.deleteBranchfromRepository(branchName);
 
     }
 }

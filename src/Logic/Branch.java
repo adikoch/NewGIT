@@ -1,5 +1,7 @@
 package Logic;
 
+import java.util.HashSet;
+
 public class Branch {
     Boolean isTracking;
     Boolean isRemote;
@@ -11,7 +13,6 @@ public class Branch {
     public Branch(String name)
     {
         branchName = name;
-
     }
 
     public String getBranchName()

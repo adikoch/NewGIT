@@ -10,7 +10,6 @@ public class Repository {
    private HashSet<Branch> branches;
    private Branch head;
     private Map objects;
-    //Commit headCommit;
 
     private String repositoryName;
     //String repositoryLocation;
@@ -34,10 +33,11 @@ public class Repository {
 
 
 
-    public void Switch(Path path)
+    public void Switch(Path newPath)
     {
-
+        path = newPath;
     }
+
     public Branch setBranchByName(String name)
     {
         Branch newBranch = null;
@@ -45,7 +45,7 @@ public class Repository {
             if (b.getBranchName().equals(name))
                 newBranch = b;
         }
-            return newBranch;
+        return newBranch;
 
     }
 }
