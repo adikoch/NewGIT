@@ -94,6 +94,7 @@ public class Folder {
             sb.append(System.lineSeparator());
         }
 
+
         return sb.toString();
     }
 
