@@ -10,9 +10,9 @@ import java.util.LinkedList;
 
 public class Commit {
     //private String SHA1;
-    private Folder treeRoot;// main library
-    //private LinkedList<String> SHA1PreveiousCommit;
+    private Folder origCommit;// main library
     private String SHA1PreveiousCommit;
+    private String SHA1PrevPrevCommit;
     private String description;
     private String creationDate;
     private String changer;
@@ -20,6 +20,9 @@ public class Commit {
     public String getSHA1PreveiousCommit() {
         return SHA1PreveiousCommit;
     }
+    public Folder getOrigCommit() { return origCommit;}
+    public void setOrigCommit(Folder folder) {origCommit =  folder;}
+
 
     public void setSHA1PreveiousCommit(String SHA1PreveiousCommit) {
         this.SHA1PreveiousCommit = SHA1PreveiousCommit;
@@ -27,26 +30,17 @@ public class Commit {
 
     public Commit()
     {
-        DateFormat dateFormat = new SimpleDateFormat("dd.MM.YYYY - hh:mm:ss:sss");
-        Date date = new Date();
-        treeRoot = new Folder();
-        //SHA1PreveiousCommit = new LinkedList<>();
         description = "Start The Machine";
-        creationDate = dateFormat.format(date);
+        creationDate = GitManager.getDate();
         changer = "Administrator";
-        //GitManager.generateSHA1FromString(this.getCommitFileContent());
     }
 
-    public Commit(String usersDescription, GitManager manager)
+    public Commit(String usersDescription, String userName)
     {
-        //ask for: , , , prevCommit, head branch update
         description=usersDescription;
-
         //Date
-        DateFormat dateFormat = new SimpleDateFormat("dd.MM.YYYY - hh:mm:ss:sss");
-        Date date = new Date();
-        creationDate = dateFormat.format(date);
-        changer= manager.getUserName();
+        creationDate = GitManager.getDate();
+        changer= userName;
         //SHA1PreveiousCommit=
         //רוצה ללכת לקובץ head שנמצא בתוך .magit.Branches ולשנות את התוכן בו לשם הבראנצ הזה
 

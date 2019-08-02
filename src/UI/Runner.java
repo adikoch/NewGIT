@@ -101,7 +101,7 @@ public class Runner {
         System.out.println("Please enter description for the commit");
         Scanner sc= new Scanner(System.in);
         String description= sc.nextLine();
-        manager.ExecuteCommit(description);
+        manager.ExecuteCommit(description, true);
         //CommitsList.add((newCommit));
 
     }
@@ -167,7 +167,7 @@ public class Runner {
             out.println("Repository's Name:" + manager.getGITRepository().getRepositoryName());
             out.println("Repository's Path:" + manager.getGITRepository().getRepositoryPath().toString());
             out.println("Repository's User:" + manager.getUserName());
-            //add diff
+            manager.ExecuteCommit("",false);
         } else {
             out.println("The is no repository defined!");
         }

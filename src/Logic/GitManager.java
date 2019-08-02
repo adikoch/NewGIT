@@ -14,17 +14,16 @@ import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import static java.lang.System.out;
-
 public class GitManager {
     private Repository GITRepository;
     private String userName;
 
-    private class diffLog {
-        private List<Path> updatedFiles;
-        private List<Path> createdFiles;
-        private List<Path> deletedFiles;
-    }
+
+//    private class diffLogClass {
+        private LinkedList<Path> updatedFiles = new LinkedList<Path>();
+        private LinkedList<Path> createdFiles = new LinkedList<Path>();
+        private LinkedList<Path> deletedFile = new LinkedList<Path>();
+   // }
 
     public Repository getGITRepository() {
         return GITRepository;
@@ -62,44 +61,75 @@ public class GitManager {
 
     }
 
-    public void ExecuteCommit(String description) {
-        Path ObjectPath= Paths.get(GITRepository.getRepositoryPath().toString()+"/.magit/Objects");
-        Path BranchesPath= Paths.get(GITRepository.getRepositoryPath().toString()+"/.magit/Branches");
-        String headBranch = readTextFile(BranchesPath+"/Head");
-        String prevCommitSha1 = readTextFile(BranchesPath+"/"+headBranch);
-        Commit newCommit= new Commit();
+    public void ExecuteCommit(String description, Boolean isCreateZip) {
+        Path ObjectPath = Paths.get(GITRepository.getRepositoryPath().toString() + "/.magit/Objects");
+        Path BranchesPath = Paths.get(GITRepository.getRepositoryPath().toString() + "/.magit/Branches");
+        String headBranch = readTextFile(BranchesPath + "\\Head");
+        String prevCommitName = readTextFile(BranchesPath + "\\" + headBranch);//לזה נעשה אןזיפ וגם לקובץ שהשם שלו הוא הsha1 שכתוב פה
+        String prevCommitSha1 = readTextFile(BranchesPath + "\\" + prevCommitName);
         //Date
-        DateFormat dateFormat = new SimpleDateFormat("dd.MM.YYYY - hh:mm:ss:sss");
-        Date date = new Date();
-        String creationDate = dateFormat.format(date);
-        Folder folder=new Folder();
-        String treeRootSha1= Sh1Directory(folder,GITRepository.getRepositoryPath(),creationDate);
-        try {
-            createFolderZip(folder,ObjectPath);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        newCommit.setSHA1PreveiousCommit(prevCommitSha1);
-        try {
-            createCommitZip(newCommit,ObjectPath);
-        } catch (IOException e) {
-            e.printStackTrace();
+        String creationDate = GitManager.getDate();
+
+        Folder newFolder = GenerateFolderSha1(GITRepository.getRepositoryPath(), creationDate);// ייצג את הספרייה הראשית
+        createShaAndZipForNewCommit(newFolder, isCreateZip);
+
+        if (isCreateZip) {
+            Commit newCommit = new Commit(description, userName);
+            newCommit.setSHA1PreveiousCommit(prevCommitSha1);
+            newCommit.setOrigCommit(newFolder);
         }
     }
 
-    private String Sh1Directory(Folder currentFolder,Path currentPath, String dateModified) {
+    private void createShaAndZipForNewCommit(Folder newFolder, Boolean isCreateZip) {
+        List<Folder.Component> newComponents = newFolder.getComponents();
+        String sh1Hex = "";
+
+        for (Folder.Component c : newComponents) {
+            if (!c.getFolderName().equals(".magit")) {
+                if (c.getFolderType().equals(FolderType.Blob)) {
+                    if (!GITRepository.getSHA1Map().containsKey(c.getFolderSHA1())) {
+                        //add to path list
+
+                        if (isCreateZip) {
+                            //create zip
+                            //add to map
+                            GITRepository.getSHA1Map().put(c.getFolderSHA1(), נתיב לשלוח לפונקציהד);
+                        }
+                    }
+
+                } else {
+                    Folder f = new Folder(c);
+                    createShaAndZipForNewCommit(f, isCreateZip);
+
+                    sh1Hex = generateSHA1FromString(newFolder.stringComponentsToString());
+                    if (!GITRepository.getSHA1Map().containsKey(sh1Hex)) {
+                        //add to path list
+                        if (isCreateZip) {
+                            //create zip
+                            //add to map
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    //לשנות את השם לgenerate from path
+    private Folder GenerateFolderSha1(Path currentPath, String dateModified) {
         File[] allFileComponents = currentPath.toFile().listFiles();
         String sh1Hex = "";
         String fileContent = "";
-        String objectsPath= currentPath+"\\Objects";
+        String objectsPath = currentPath + "\\Objects";
+        Folder currentFolder = new Folder();
 
         for (File f : allFileComponents) {
             if (!f.getName().equals(".magit")) {
                 if (!f.isDirectory()) {
                     fileContent = readTextFile(f.toString());
                     sh1Hex = DigestUtils.sha1Hex(fileContent);
+                    //לוגית יוצרת את האובייקט שהוא קומפוננט שמתאר בלוב
                     currentFolder.getComponents().add(new Folder.Component(f.getName(), sh1Hex, "Blob", userName, dateModified));
-                    //כאן יהיה if שבודק
+                    //objects פיזית בתוך התיקייה
                     /*try {
                         createBlobZip(new Blob(fileContent), currentPath);
                     } catch (IOException e) {
@@ -107,8 +137,8 @@ public class GitManager {
                     }
                      */
                 } else {
-                    Folder folder = new Folder();
-                    sh1Hex = Sh1Directory(folder, Paths.get(f.getPath()), dateModified);
+                    Folder folder = GenerateFolderSha1(Paths.get(f.getPath()), dateModified);
+                    sh1Hex = generateSHA1FromString(folder.stringComponentsToString());
                     currentFolder.getComponents().add(new Folder.Component(
                             f.getName(), sh1Hex, "FOLDER", userName, dateModified));
 
@@ -123,10 +153,9 @@ public class GitManager {
         }
 
 
-
         Collections.sort(currentFolder.getComponents());
 
-        return DigestUtils.sha1Hex(currentFolder.toString());
+        return currentFolder;
     }
 
     public void CreatBranch() {
@@ -163,6 +192,10 @@ public class GitManager {
             createFile("Head", "Master", Paths.get(repPath + repName + "\\.magit\\branches"));
 
             GITRepository.setBranchByName("Master").pointedCommit = GITRepository.getHeadBranch().getPointedCommit();
+
+            //create origcommit
+            Folder folder = GenerateFolderSha1(GITRepository.getRepositoryPath(), GitManager.getDate());
+            GITRepository.getHeadBranch().pointedCommit.setOrigCommit(folder);
         }
 
     }
@@ -174,7 +207,7 @@ public class GitManager {
             if (Files.exists(checkIfMagit)) {
                 File f = Paths.get(newRepPath.toString() + "\\.magit\\branches\\Head").toFile();
                 String content;
-                    content = readTextFile(newRepPath + "\\.magit\\branches\\" + f.getName());
+                content = readTextFile(newRepPath + "\\.magit\\branches\\" + f.getName());
                 String name = readTextFile(newRepPath + "\\.magit\\branches\\" + content);
                 this.GITRepository = new Repository(newRepPath, new Branch(content));
                 GITRepository.Switch(newRepPath);
@@ -183,6 +216,10 @@ public class GitManager {
             } else throw new Exception();//exeption forG not being magit
 
         } else throw new Exception();//exception for not existing
+
+        //create origcommit
+        Folder folder = GenerateFolderSha1(GITRepository.getRepositoryPath(), GitManager.getDate());
+        GITRepository.getHeadBranch().pointedCommit.setOrigCommit(folder);
     }
 
 
@@ -195,9 +232,7 @@ public class GitManager {
                 GITRepository.getBranches().add(newB);
                 newB.pointedCommit = GITRepository.getHeadBranch().pointedCommit;
             }
-
         }
-
     }
 
     private static void createFileInMagit(Object obj, Path path) throws IOException {
@@ -301,45 +336,11 @@ public class GitManager {
         }
         return returnValue;
     }
+
+    public static String getDate() {
+        DateFormat dateFormat = new SimpleDateFormat("dd.MM.YYYY - hh:mm:ss:sss");
+        Date date = new Date();
+        return dateFormat.format(date);
+    }
+
 }
-
-
-
-
-
-
-
-
-
-
-// הפונקציה של ניהול הקבצים רקורסיבית
-//מקבלת
-// (תאריך,תיקייה במובן המוחשי,תיקייה במובן הלוגי)
-/*
-private String Sh1Directory(Folder currentFolder,Path currentPath, String dateModified) {
-        File[] allFileComponents = currentPath.toFile().listFiles();
-        String sh1Hex = "";
-        String fileContent = "";
-        //Folder currentFolder = new Folder();
-
-        for (File f : allFileComponents) {
-            if (!f.getName().equals(".magit")) {
-                if (!f.isDirectory()) {
-                    fileContent = readTextFile(f.toString());
-                    sh1Hex = DigestUtils.sha1Hex(fileContent);
-                    if (!Files.exists(Paths.get(currentPath.toString() + f.getName()))) {//if a file with the given sh1 does not exist
-                        currentFolder.getComponents().add(new Folder.FolderComponent(
-                                f.getName(), sh1Hex, "BLOB", username, dateModified));
-                        createNewObjectFile(sh1Hex,fileContent);
-                    }
-                } else {
-                    if (!Files.exists(Paths.get(currentPath.toString() + f.getName()))){//if a folder with the given sh1 does not exist)
-                        Folder folder = new Folder();
-                        sh1Hex = Sh1Directory(folder,Paths.get(f.getPath()), dateModified);
-                        currentFolder.getComponents().add(new Folder.FolderComponent(
-                                f.getName(), sh1Hex, "FOLDER", username, dateModified));
-                    }
-                }
-            }
-        }
- */

@@ -1,6 +1,7 @@
 package Logic;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,8 +16,14 @@ public class Folder {
     //List<component> items;//sha1
     //Boolean isRoot;
 
-    private List<Component> components;
+    private LinkedList<Component> components;
     //private String SHA1;
+
+    public Folder(Component c)
+    {
+        components = new LinkedList<>();
+        components.add(c);
+    }
 
 
     protected static class Component implements Comparable<Component>{
@@ -41,7 +48,12 @@ public class Folder {
         public int compareTo(Component folderComponent) {
             return this.name.compareTo(folderComponent.name);
         }
-
+    public FolderType getFolderType()
+    {return type;}
+        public String  getFolderName()
+        {return name;}
+        public String  getFolderSHA1()
+        {return Sha1;}
 
 
         public String getComponentsString() {

@@ -1,6 +1,7 @@
 package Logic;
 
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
@@ -9,7 +10,7 @@ public class Repository {
    private Path path;
    private HashSet<Branch> branches;
    private Branch head;
-    private Map objects;
+    private Map<String,Path> SHA1Map = new HashMap<String,Path>();
 
     private String repositoryName;
     //String repositoryLocation;
@@ -31,7 +32,7 @@ public class Repository {
     public  HashSet<Branch> getBranches(){ return branches ; }
     public Branch getHeadBranch (){return head;}
 
-
+    public Map<String,Path> getSHA1Map(){ return SHA1Map;}
 
     public void Switch(Path newPath)
     {
