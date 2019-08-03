@@ -2,6 +2,7 @@ package Logic;
 
 import java.io.File;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -16,12 +17,12 @@ public class Folder {
     //List<component> items;//sha1
     //Boolean isRoot;
 
-    private LinkedList<Component> components;
+    private ArrayList<Component> components;
     //private String SHA1;
 
     public Folder(Component c)
     {
-        components = new LinkedList<>();
+        components = new ArrayList<>();
         components.add(c);
     }
 
@@ -48,9 +49,11 @@ public class Folder {
         public int compareTo(Component folderComponent) {
             return this.name.compareTo(folderComponent.name);
         }
-    public FolderType getFolderType()
+    public FolderType getComponentType()
     {return type;}
-        public String  getFolderName()
+    public String getComponentSHA1()
+    { return Sha1;}
+        public String  getComponentName()
         {return name;}
         public String  getFolderSHA1()
         {return Sha1;}
@@ -84,7 +87,7 @@ public class Folder {
     public Folder() // creating by XML or new empty root
     {
         //SHA1 = org.apache.commons.codec.digest.DigestUtils.sha1Hex("");
-        components = new LinkedList<>();
+        components = new ArrayList<>();
 
     }
 
@@ -107,7 +110,7 @@ public class Folder {
 
     }
 
-    public List<Component> getComponents() {
+    public ArrayList<Component> getComponents() {
         return this.components;
     }
 
