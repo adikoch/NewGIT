@@ -66,20 +66,20 @@ public class GitManager {
         Path BranchesPath = Paths.get(GITRepository.getRepositoryPath().toString() + "\\.magit\\Branches");
         String headBranch = readTextFile(BranchesPath + "\\Head");
         String prevCommitSHA1 = readTextFile(BranchesPath + "\\" + headBranch);//לזה נעשה אןזיפ וגם לקובץ שהשם שלו הוא הsha1 שכתוב פה
-        String prevCommitContent = readTextFile(ObjectPath + "\\" + prevCommitSHA1);
         //Date
         String creationDate = GitManager.getDate();
 
         Folder newFolder = GenerateFolderSha1(GITRepository.getRepositoryPath(), creationDate);// ייצג את הספרייה הראשית
         Folder oldFolder = GITRepository.getHeadBranch().pointedCommit.getRootfolder();
-        createShaAndZipForNewCommit(newFolder,oldFolder, isCreateZip,ObjectPath);
+        createShaAndZipForNewCommit(newFolder,oldFolder, isCreateZip,GITRepository.getRepositoryPath());
 
 
         if (isCreateZip) {
-            Commit newCommit = new Commit(description, userName);
-            newCommit.setSHA1PreveiousCommit(prevCommitSHA1);
-            newCommit.setOrigCommit(newFolder);
+            GITRepository.getHeadBranch().pointedCommit = new Commit(description, userName);
+            GITRepository.getHeadBranch().pointedCommit.setSHA1PreveiousCommit(prevCommitSHA1);
+            GITRepository.getHeadBranch().pointedCommit.setOrigCommit(newFolder);
         }
+
     }
 
     private void createShaAndZipForNewCommit(Folder newFolder,Folder oldFolder, Boolean isCreateZip, Path path) {
@@ -96,7 +96,7 @@ public class GitManager {
                     if (oldComponents.get(oldd).getComponentName().equals(newComponents.get(neww).getComponentName())) {
                         if (oldComponents.get(oldd).getComponentSHA1().equals(newComponents.get(neww).getComponentSHA1())) {
                             //point old object
-                            newComponents.set(neww,oldComponents.get(oldd));
+                            newComponents.set(neww, oldComponents.get(oldd));
                             return;
                         } else if (oldComponents.get(oldd).getComponentType().equals(newComponents.get(neww).getComponentType())) {
                             if (oldComponents.get(oldd).getComponentType().equals(FolderType.Folder)) {
@@ -108,7 +108,7 @@ public class GitManager {
                                 //createZipFile(path,newComponents.get(neww).getComponentSHA1(),newComponents.get(neww).);
                                 //add updated file zip
                                 //add to path
-                                this.updatedFiles.add(Paths.get(path.toString() + "\\" + newComponents.get(neww).getComponentSHA1()));
+                                this.updatedFiles.add(Paths.get(path.toString() + "\\" + newComponents.get(neww).getComponentName()));
 
                             }
                         } else {
@@ -117,7 +117,7 @@ public class GitManager {
                             //createZipFile(path,newComponents.get(neww).getComponentSHA1(),newComponents.get(neww).);
 
                             //add to list
-                            this.createdFiles.add(Paths.get(path.toString() + "\\" + newComponents.get(neww).getComponentSHA1()));
+                            this.createdFiles.add(Paths.get(path.toString() + "\\" + newComponents.get(neww).getComponentName()));
                             neww++;
                         }
                     } else {
@@ -126,7 +126,7 @@ public class GitManager {
                             //file was deleted from old
                             oldd++;
                             //add to list
-                            this.deletedFile.add(Paths.get(path.toString() + "\\" + newComponents.get(neww).getComponentSHA1()));
+                            this.deletedFile.add(Paths.get(path.toString() + "\\" + oldComponents.get(oldd).getComponentName()));
                         } else {
                             //new file was added
                             neww++;
@@ -134,14 +134,24 @@ public class GitManager {
                             //createZipFile(path,newComponents.get(neww).getComponentSHA1(),newComponents.get(neww).);
 
                             //add to list
-                            this.createdFiles.add(Paths.get(path.toString() + "\\" + newComponents.get(neww).getComponentSHA1()));
+                            this.createdFiles.add(Paths.get(path.toString() + "\\" + newComponents.get(neww).getComponentName()));
                         }
                     }
                 }
+
+                oldd++;
             }
+            neww++;
+        }
+        while (oldd < oldComponents.size() ) {
+            this.deletedFile.add(Paths.get(path.toString() + "\\" + oldComponents.get(oldd).getComponentSHA1()));
             oldd++;
         }
-        neww++;
+        while ( neww < newComponents.size()) {
+            this.createdFiles.add(Paths.get(path.toString() + "\\" + newComponents.get(neww).getComponentName()));
+            neww++;
+
+        }
     }
 //
 //                        if (oldComponents.get(oldd).getComponentType().equals(FolderType.Blob)) {
@@ -256,7 +266,7 @@ public class GitManager {
             new File(repPath + repName + "\\.magit\\objects").mkdirs();
             new File(repPath + repName + "\\.magit\\branches").mkdirs();
             Path workingPath = Paths.get(repPath + repName + "\\");
-            this.GITRepository = (new Repository(workingPath, new Branch("Master")));
+            this.GITRepository = (new Repository(workingPath , new Branch("Master")));
             GITRepository.getHeadBranch().pointedCommit = new Commit();
             GITRepository.getHeadBranch().pointedCommit.setRootfolder(workingPath.toString());
             GITRepository.getHeadBranch().pointedCommit.setCommitFileContentToSHA();
@@ -271,6 +281,7 @@ public class GitManager {
 //            //create origcommit
            Folder folder = GenerateFolderSha1(GITRepository.getRepositoryPath(), GitManager.getDate());
             GITRepository.getHeadBranch().pointedCommit.setOrigCommit(folder);
+            this.userName = "Ädministrator";
         }
 
     }

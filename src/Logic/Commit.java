@@ -70,8 +70,12 @@ public class Commit {
     public void setCommitFileContentToSHA() {
         String delimiter = ", ";
         StringBuilder s = new StringBuilder();
-
-        s.append(GitManager.generateSHA1FromString(rootFolder.getFolderContentString()));
+if(rootFolder != null) {
+    s.append(GitManager.generateSHA1FromString(rootFolder.getFolderContentString()));
+}
+else {
+    s.append(GitManager.generateSHA1FromString(""));
+}
         s.append(System.lineSeparator());
         s.append(getSHA1PreveiousCommit());
         s.append(System.lineSeparator());
