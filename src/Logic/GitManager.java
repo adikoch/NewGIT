@@ -376,7 +376,7 @@ public class GitManager {
         createZipFile(path, SHA, content);
     }
 
-    private static void createBlobZip(Blob blob, Path path)  throws IOException
+    private static void createBlobZip(Blob blob, Path path) { throws IOException
         String content = blob.getContent();
         String SHA = generateSHA1FromString(content);
 
