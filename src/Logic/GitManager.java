@@ -71,7 +71,7 @@ public class GitManager {
         String creationDate = GitManager.getDate();
 
         Folder newFolder = GenerateFolderSha1(GITRepository.getRepositoryPath(), creationDate);// ייצג את הספרייה הראשית
-        Folder oldFolder = GITRepository.getHeadBranch().pointedCommit.getRootfolder();
+        Folder oldFolder = GITRepository.getHeadBranch().getPointedCommit().getRootfolder();
         createShaAndZipForNewCommit(newFolder,oldFolder, isCreateZip,ObjectPath);
 
 
@@ -257,20 +257,20 @@ public class GitManager {
             new File(repPath + repName + "\\.magit\\branches").mkdirs();
             Path workingPath = Paths.get(repPath + repName + "\\");
             this.GITRepository = (new Repository(workingPath, new Branch("Master")));
-            GITRepository.getHeadBranch().pointedCommit = new Commit();
-            GITRepository.getHeadBranch().pointedCommit.setRootfolder(workingPath.toString());
-            GITRepository.getHeadBranch().pointedCommit.setCommitFileContentToSHA();
+            GITRepository.getHeadBranch().setPointedCommit(new Commit());
+            GITRepository.getHeadBranch().getPointedCommit().setRootfolder(workingPath.toString());
+            GITRepository.getHeadBranch().getPointedCommit().setCommitFileContentToSHA();
 //Create commit file
 
-            createFileInMagit(GITRepository.getHeadBranch().pointedCommit, workingPath);//commit
+            createFileInMagit(GITRepository.getHeadBranch().getPointedCommit(), workingPath);//commit
             createFileInMagit(GITRepository.getHeadBranch(), workingPath);
             createFile("Head", "Master", Paths.get(repPath + repName + "\\.magit\\branches"));
 
-            GITRepository.setBranchByName("Master").pointedCommit = GITRepository.getHeadBranch().getPointedCommit();
+            GITRepository.setBranchByName("Master").setPointedCommit(GITRepository.getHeadBranch().getPointedCommit());
 
 //            //create origcommit
            Folder folder = GenerateFolderSha1(GITRepository.getRepositoryPath(), GitManager.getDate());
-            GITRepository.getHeadBranch().pointedCommit.setOrigCommit(folder);
+            GITRepository.getHeadBranch().getPointedCommit().setOrigCommit(folder);
         }
 
     }
@@ -294,7 +294,7 @@ public class GitManager {
 
         //create origcommit
         Folder folder = GenerateFolderSha1(GITRepository.getRepositoryPath(), GitManager.getDate());
-        GITRepository.getHeadBranch().pointedCommit.setOrigCommit(folder);
+        GITRepository.getHeadBranch().getPointedCommit().setOrigCommit(folder);
     }
 
 
@@ -305,7 +305,7 @@ public class GitManager {
             } else {
                 Branch newB = new Branch(newBranchName);
                 GITRepository.getBranches().add(newB);
-                newB.pointedCommit = GITRepository.getHeadBranch().pointedCommit;
+                newB.setPointedCommit(GITRepository.getHeadBranch().getPointedCommit());
             }
         }
     }

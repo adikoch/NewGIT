@@ -15,6 +15,8 @@ import java.util.Scanner;
 import static java.lang.System.lineSeparator;
 import static java.lang.System.out;
 
+
+
 public class Runner {
     private Scanner scanInput = new Scanner(System.in);
     private GitManager manager = new GitManager();
@@ -22,16 +24,21 @@ public class Runner {
 
 
     public void run() {
+        boolean isValid=true;
         MainMenu menu = new MainMenu();
         int userInput = 0;
-        while (userInput != 13) {
-            menu.show();
+        while (userInput != 13 || !isValid) {
+            if(isValid) menu.show();
+            userInput = scanInput.nextInt();
             try {
-                userInput = scanInput.nextInt();
+                if(isOutOfRange(0,13,userInput)){
                 sendToOption(userInput);
+                isValid=true;
+                }
 
             } catch (IndexOutOfBoundsException ex) {
-                System.out.println("number out of bound!");
+                System.out.println("number out of bound! Please enter a valid input");
+                isValid=false;
             }
         }
     }
@@ -40,7 +47,7 @@ public class Runner {
     private void sendToOption(int userInput) {
         switch (userInput) {
             case (1):
-                UpdateUsername();
+                UpdateUsername();//validation V
                 break;
 
             case (2):
@@ -96,6 +103,33 @@ public class Runner {
 
     }
 
+    private void UpdateUsername() {
+        if (manager.getGITRepository() != null) {
+
+            System.out.println("Please enter the new username:");
+            String NewUserName = scanInput.nextLine();
+            manager.updateNewUserNameInLogic(NewUserName);
+        } else {
+            out.println("There is no repository defined! no changes occurred");
+        }
+    }
+
+    private void SwitchRepository() {
+        Scanner sb = new Scanner(System.in);
+
+        System.out.println("Enter the new repository's path:");
+        String NewRepositoryPathString = sb.nextLine();
+        Path NewRepositoryPath = Paths.get(NewRepositoryPathString);
+        try {
+            manager.switchRepository(NewRepositoryPath);
+        } catch (Exception e)//there are two kindes possible: exception for not existing, exeption for not being magit, need to handle 2 of them
+        {
+            System.out.println((""));
+        }
+    }
+
+
+
     private void Commit()
     {
         System.out.println("Please enter description for the commit");
@@ -137,30 +171,8 @@ public class Runner {
         }
     }
 
-    private void UpdateUsername() {
-        if (manager.getGITRepository() != null) {
 
-            System.out.println("Enter the new username:");
-        String NewUserName = scanInput.nextLine();
-        manager.updateNewUserNameInLogic(NewUserName);
-        } else {
-            out.println("The is no repository defined!");
-        }
-    }
 
-    private void SwitchRepository() {
-        Scanner sb = new Scanner(System.in);
-
-        System.out.println("Enter the new repository's path:");
-        String NewRepositoryPathString = sb.nextLine();
-        Path NewRepositoryPath = Paths.get(NewRepositoryPathString);
-        try {
-            manager.switchRepository(NewRepositoryPath);
-        } catch (Exception e)//there are two kindes possible: exception for not existing, exeption for not being magit, need to handle 2 of them
-        {
-            System.out.println((""));
-        }
-    }
 
     public void ShowStatus() {
         if (manager.getGITRepository() != null) {
@@ -202,4 +214,13 @@ public class Runner {
         manager.deleteBranchfromRepository(branchName);
 
     }
+
+    public boolean isOutOfRange(int min, int max, int val)
+    {
+        if (val>=min && val<=max)
+            return true;
+        else throw new IndexOutOfBoundsException();
+    }
 }
+
+
