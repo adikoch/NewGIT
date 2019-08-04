@@ -1,7 +1,7 @@
 package Logic;
 
 import UI.Runner;
-import sun.security.pkcs11.P11Util;
+
 
 import java.io.File;
 import java.nio.file.Path;
@@ -21,33 +21,13 @@ public class Commit {
     private String changer;
     private String SHAContent;
 
-    public String getSHA1PreveiousCommit() {
-        return SHA1PreveiousCommit;
-    }
-   public String getSHA1PrevePrevCommit(){return SHA1PrevPrevCommit;}
-    public String getRootfolderName(){return rootFolderPathName;}
-    public void setRootfolder(String path){ rootFolderPathName = path;}
-    public Folder getRootfolder(){return rootFolder;}
-
-
-       public Folder getOrigCommit() { return rootFolder;}
-      public void setOrigCommit(Folder folder) {rootFolder =  folder;}
-    public void setSHA1ToCommit(Path path)
-    {
-
-    }
-
-    public void setSHA1PreveiousCommit(String SHA1PreveiousCommit) {
-        this.SHA1PreveiousCommit = SHA1PreveiousCommit;
-    }
+    //constractors
 
     public Commit()
     {
         description = "Start The Machine";
         creationDate = GitManager.getDate();
         changer = "Administrator";
-
-
     }
 
     public Commit(String usersDescription, String userName)
@@ -56,16 +36,63 @@ public class Commit {
         //Date
         creationDate = GitManager.getDate();
         changer= userName;
-        //SHA1PreveiousCommit=
-        //רוצה ללכת לקובץ head שנמצא בתוך .magit.Branches ולשנות את התוכן בו לשם הבראנצ הזה
+    }
 
-
-
-        //prev Commit
+    public Commit(File file)
+    {
 
     }
 
-    public String getDescription (){return description;}
+
+    // getters, setters
+
+    public String getSHA1PreveiousCommit() {
+        return SHA1PreveiousCommit;
+    }
+
+    public void setSHA1PreveiousCommit(String SHA1PreveiousCommit) {
+        this.SHA1PreveiousCommit = SHA1PreveiousCommit;
+    }
+
+    public String getSHA1PrevePrevCommit() {
+        return SHA1PrevPrevCommit;}
+
+    public void setSHA1PrevPrevCommit(){
+
+    }
+
+    public String getRootFolderPathName(){
+        return rootFolderPathName;}
+
+    public void setRootFolderPathName(){
+
+    }
+
+    public Folder getRootfolder(){
+        return rootFolder;}
+
+    public void setRootfolder(String path){
+        rootFolderPathName = path;}
+
+
+    public Folder getOrigCommit() {
+        return rootFolder;}
+
+    public void setOrigCommit(Folder folder) {
+        rootFolder =  folder;}
+
+    public void setSHA1(String SHA1)
+    {
+        this.SHA1=SHA1;
+    }
+
+    public String getSHA1()
+    {
+        return SHA1;
+    }
+
+    public String getDescription (){
+        return description;}
 
     public void setCommitFileContentToSHA() {
         String delimiter = ", ";
@@ -90,6 +117,32 @@ else {
         SHAContent = s.toString();
     }
 
+
+
+    public String getSHA(){
+        return SHA1;
+        //return  GitManager.generateSHA1FromString(getCommitFileContent());
+    }
+    public String getSHAContent(){
+        return SHAContent;
+        //return  GitManager.generateSHA1FromString(getCommitFileContent());
+    }
+
+
+
+
+
+
+    public void exportToFile()
+    {
+
+    }
+
+
+
+}
+
+
 //    public String getCommitFileContent() {
 //        String delimiter = ", ";
 //        StringBuilder sb = new StringBuilder();
@@ -108,40 +161,16 @@ else {
 //        sb.append(changer);
 //        return sb.toString();
 //    }
-
-    public String getSHA(){
-        return SHA1;
-        //return  GitManager.generateSHA1FromString(getCommitFileContent());
-    }
-    public String getSHAContent(){
-        return SHAContent;
-        //return  GitManager.generateSHA1FromString(getCommitFileContent());
-    }
-
-    /*public String getPreviousCommitsSHAs(String delimiter) {
-        StringBuilder sb = new StringBuilder();
-        for(String sha: this.SHA1PreveiousCommit) {
-            sb.append(sha);
-            sb.append(delimiter);
-        }
-        if(SHA1PreveiousCommit.size() != 0) {
-            sb.delete(sb.length() - delimiter.length() - 1, sb.length() - 1);
-        }
-
-        return sb.toString();
-    }*/
-
-
-    public Commit(File file)
-    {
-
-    }
-
-    public void exportToFile()
-    {
-
-    }
-
-
-
-}
+//
+//    /*public String getPreviousCommitsSHAs(String delimiter) {
+//        StringBuilder sb = new StringBuilder();
+//        for(String sha: this.SHA1PreveiousCommit) {
+//            sb.append(sha);
+//            sb.append(delimiter);
+//        }
+//        if(SHA1PreveiousCommit.size() != 0) {
+//            sb.delete(sb.length() - delimiter.length() - 1, sb.length() - 1);
+//        }
+//
+//        return sb.toString();
+//    }*/

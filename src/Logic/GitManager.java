@@ -66,6 +66,7 @@ public class GitManager {
         Path BranchesPath = Paths.get(GITRepository.getRepositoryPath().toString() + "\\.magit\\Branches");
         String headBranch = readTextFile(BranchesPath + "\\Head");
         String prevCommitSHA1 = readTextFile(BranchesPath + "\\" + headBranch);//לזה נעשה אןזיפ וגם לקובץ שהשם שלו הוא הsha1 שכתוב פה
+        String prevCommitContent = readTextFile(ObjectPath + "\\" + prevCommitSHA1);
         //Date
         String creationDate = GitManager.getDate();
 
@@ -79,7 +80,6 @@ public class GitManager {
             GITRepository.getHeadBranch().pointedCommit.setSHA1PreveiousCommit(prevCommitSHA1);
             GITRepository.getHeadBranch().pointedCommit.setOrigCommit(newFolder);
         }
-
     }
 
     private void createShaAndZipForNewCommit(Folder newFolder,Folder oldFolder, Boolean isCreateZip, Path path) {
@@ -276,12 +276,13 @@ public class GitManager {
             createFileInMagit(GITRepository.getHeadBranch(), workingPath);
             createFile("Head", "Master", Paths.get(repPath + repName + "\\.magit\\branches"));
 
-            GITRepository.setBranchByName("Master").pointedCommit = GITRepository.getHeadBranch().getPointedCommit();
+            GITRepository.setBranchByName("Master").setPointedCommit(GITRepository.getHeadBranch().getPointedCommit());
 
 //            //create origcommit
            Folder folder = GenerateFolderSha1(GITRepository.getRepositoryPath(), GitManager.getDate());
             GITRepository.getHeadBranch().pointedCommit.setOrigCommit(folder);
             this.userName = "Ädministrator";
+            GITRepository.getHeadBranch().getPointedCommit().setOrigCommit(folder);
         }
 
     }
@@ -305,7 +306,7 @@ public class GitManager {
 
         //create origcommit
         Folder folder = GenerateFolderSha1(GITRepository.getRepositoryPath(), GitManager.getDate());
-        GITRepository.getHeadBranch().pointedCommit.setOrigCommit(folder);
+        GITRepository.getHeadBranch().getPointedCommit().setOrigCommit(folder);
     }
 
 
@@ -316,7 +317,7 @@ public class GitManager {
             } else {
                 Branch newB = new Branch(newBranchName);
                 GITRepository.getBranches().add(newB);
-                newB.pointedCommit = GITRepository.getHeadBranch().pointedCommit;
+                newB.setPointedCommit(GITRepository.getHeadBranch().getPointedCommit());
             }
         }
     }

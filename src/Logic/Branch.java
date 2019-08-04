@@ -8,7 +8,7 @@ public class Branch {
 
    private String branchName;
     private Boolean isMaster;
-    Commit pointedCommit;
+    private Commit pointedCommit;
 
     public Branch(String name)
     {
@@ -20,9 +20,15 @@ public class Branch {
         return branchName;
     }
 
+
     public Commit getPointedCommit()
     {
         return pointedCommit;
+    }
+
+    public void setPointedCommit(Commit pointedCommit)
+    {
+        this.pointedCommit=pointedCommit;
     }
 
     //  tracking true
