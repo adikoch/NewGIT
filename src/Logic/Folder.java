@@ -34,9 +34,9 @@ public class Folder {
         private String lastUpdater;
         private String lastUpdateDate;
 
-        public Component(String name, String sha1, String type, String lastUpdater, String lastUpdateDate){
+        public Component(String name, String sha1, FolderType type, String lastUpdater, String lastUpdateDate){
 
-            this.type=FolderType.valueOf(type);
+            this.type= type;
             this.name=name;
             this.lastUpdateDate=lastUpdateDate;
             this.Sha1=sha1;

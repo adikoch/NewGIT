@@ -1,9 +1,7 @@
 package Logic;
 
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 
 public class Repository {
 
@@ -11,6 +9,12 @@ public class Repository {
    private HashSet<Branch> branches;
    private Branch head;
     private Map<String,Path> SHA1Map = new HashMap<String,Path>();
+    private LinkedList<Commit> commitList = new LinkedList<Commit>();
+
+
+    public LinkedList<Commit> getCommitList() {
+        return commitList;
+    }
 
     private String repositoryName;
     //String repositoryLocation;
