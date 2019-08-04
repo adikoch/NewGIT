@@ -136,6 +136,9 @@ public class Runner {
         Scanner sc= new Scanner(System.in);
         String description= sc.nextLine();
         manager.ExecuteCommit(description, true);
+        manager.getCreatedFiles().clear();
+        manager.getDeletedFile().clear();
+        manager.getUpdatedFiles().clear();
         //CommitsList.add((newCommit));
 
     }
