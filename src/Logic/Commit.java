@@ -86,11 +86,6 @@ public class Commit {
         this.SHA1=SHA1;
     }
 
-    public String getSHA1()
-    {
-        return SHA1;
-    }
-
     public String getDescription (){
         return description;}
 
