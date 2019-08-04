@@ -2,6 +2,7 @@ package UI;
 import Logic.Branch;
 import Logic.Commit;
 import Logic.GitManager;
+import org.graalvm.compiler.core.CompilationWrapper;
 
 
 import java.io.IOException;
@@ -136,6 +137,9 @@ public class Runner {
         Scanner sc= new Scanner(System.in);
         String description= sc.nextLine();
         manager.ExecuteCommit(description, true);
+        manager.getCreatedFiles().clear();
+        manager.getDeletedFile().clear();
+        manager.getUpdatedFiles().clear();
         //CommitsList.add((newCommit));
 
     }
@@ -166,8 +170,12 @@ public class Runner {
         String repName = sc.nextLine();
         try {
             manager.createEmptyRepositoryFolders(repPath, repName);
-        } catch (IOException ex) {
-            System.out.println(ex.getMessage());
+        }
+        catch(FileAlreadyExistsException nameEx) {// the wanted name is not available
+            System.out.println("The name you chose is allready in the system, please choose a different name");
+        }
+        catch(ArithmeticException pathEx) { // path does not exist
+            out.println("The path you chose does not exist, please choose a different one");
         }
     }
 
