@@ -20,15 +20,14 @@ public class Branch {
         return branchName;
     }
 
-
     public Commit getPointedCommit()
     {
         return pointedCommit;
     }
 
-    public void setPointedCommit(Commit pointedCommit)
+    public void setPointedCommit(Commit newC)
     {
-        this.pointedCommit=pointedCommit;
+        pointedCommit=newC;
     }
 
     //  tracking true

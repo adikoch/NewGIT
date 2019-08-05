@@ -35,6 +35,7 @@ public class Repository {
     public  Path getRepositoryPath(){ return path; }
     public  HashSet<Branch> getBranches(){ return branches ; }
     public Branch getHeadBranch (){return head;}
+    //public void setHeadBranch(Branch b){this.head=b; }
 
     public Map<String,Path> getSHA1Map(){ return SHA1Map;}
 
@@ -53,4 +54,11 @@ public class Repository {
         return newBranch;
 
     }
+
+    /*public void setBranchByName(String name)
+    {
+        for(Branch b:branches) {
+            if (b.getBranchName().equals(name))
+                head = b;}
+    }*/
 }

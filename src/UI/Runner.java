@@ -2,6 +2,7 @@ package UI;
 import Logic.Branch;
 import Logic.Commit;
 import Logic.GitManager;
+//import org.graalvm.compiler.core.CompilationWrapper;
 
 
 import java.io.IOException;
@@ -23,25 +24,48 @@ public class Runner {
     //private LinkedList<Commit> CommitsList= new LinkedList<>();
 
 
-    public void run() {
+ /*   public void run() {
         boolean isValid=true;
         MainMenu menu = new MainMenu();
-        int userInput = 0;
-        while (userInput != 13 || !isValid) {
+        String userInput = "1";
+        while (userInput !="13" || !isValid) {
             if(isValid) menu.show();
-            userInput = scanInput.nextInt();
-            try {
-                if(isOutOfRange(0,13,userInput)){
-                sendToOption(userInput);
-                isValid=true;
-                }
-
-            } catch (IndexOutOfBoundsException ex) {
-                System.out.println("number out of bound! Please enter a valid input");
-                isValid=false;
+            try{
+            userInput = scanInput.nextLine();
+            isValid= !isOutOfRange(1,13,userInput);
             }
+            catch(Exception e) {isValid=false;}
+            if(isValid)// קלט תקין
+            {
+                sendToOption(userInput);
+            }
+            else System.out.println("number out of bound! Please enter a valid input");
+        }
+    }*/
+
+
+    public void run() {
+        boolean isNumber=true, isValid=true;
+        int result=0;
+        MainMenu menu = new MainMenu();
+        String userInput="0";
+        while(userInput!="13" || !isValid)
+        {
+            if (isValid) menu.show();
+            userInput=scanInput.nextLine();
+            try{result = Integer.parseInt(userInput);}
+            catch (NumberFormatException e) {isNumber= false;}
+
+            if(isNumber)
+            {
+                isValid=!isOutOfRange(1,13,result);
+            }
+            if(isValid)
+                sendToOption(result);
+            else out.println("number out of bound! Please enter a valid input");
         }
     }
+
 
 
     private void sendToOption(int userInput) {
@@ -122,9 +146,12 @@ public class Runner {
         Path NewRepositoryPath = Paths.get(NewRepositoryPathString);
         try {
             manager.switchRepository(NewRepositoryPath);
-        } catch (Exception e)//there are two kindes possible: exception for not existing, exeption for not being magit, need to handle 2 of them
-        {
-            System.out.println((""));
+        }
+        catch (ExceptionInInitializerError e) {
+            out.println("This path is not a part of the magit system");
+        }
+        catch (IllegalArgumentException er) {
+            out.println("The path does not exist");
         }
     }
 
@@ -137,8 +164,8 @@ public class Runner {
         String description= sc.nextLine();
         try {
             manager.ExecuteCommit(description, true);
-        } catch (IOException e) {
-            out.println("Commit Failed!");        }
+        } catch (Exception e) {
+            out.println("Commit Failed! Unable to create files");}
         manager.getCreatedFiles().clear();
         manager.getDeletedFile().clear();
         manager.getUpdatedFiles().clear();
@@ -146,36 +173,53 @@ public class Runner {
 
     }
 
-    private void CreatBranch() {
+    private void CreatBranch() {//
+        boolean isValid=false;
         if (manager.getGITRepository() != null) {
-        Scanner sc = new Scanner(System.in);
-
-        System.out.println("Enter the full name for the new branch: ");
-        String newBranchName = sc.nextLine();
-        try {
-            manager.CreateNewBranch(newBranchName);
-        } catch (IOException ex) {
-
-            System.out.println(ex.getMessage());
-        }
-    } else {
-        out.println("The is no repository defined!");
+            Scanner sc = new Scanner(System.in);
+            while(!isValid){
+                System.out.println("Enter the full name for the new branch: ");
+                String newBranchName = sc.nextLine();
+                try {
+                    manager.CreateNewBranch(newBranchName);
+                    isValid=true;
+                } catch (FileAlreadyExistsException ex) {
+                    System.out.println("The branch name already exist, please try again");
+                    isValid=false;
+                }
+            }
+    }   else {
+        out.println("There is no repository defined!");
     }
     }
 
     private void createEmptyRepository() {
+        boolean isValid=false;
         Scanner sc = new Scanner(System.in);
 
-        System.out.println("Enter the full path for the new repository: ");
-        String repPath = sc.nextLine();
-        System.out.println("Choose name for the new repository: ");
-        String repName = sc.nextLine();
-        try {
-            manager.createEmptyRepositoryFolders(repPath, repName);
-        } catch (IOException ex) {
-            System.out.println(ex.getMessage());
+        while(!isValid) {
+            out.println("Enter the full path for the new repository: ");
+            String repPath = sc.nextLine();
+            out.println("Choose name for the new repository: ");
+            String repName = sc.nextLine();
+            try {
+                manager.createEmptyRepositoryFolders(repPath, repName);
+                isValid=true;
+            }
+            catch (IllegalArgumentException e) {
+                out.println("The wanted name already exist, please try again");
+                isValid=false;}
+            catch (ExceptionInInitializerError er) {
+                out.println("The wanted path does not exist, please try again");
+                isValid=false;}
         }
     }
+
+    /*
+                }   else throw new IllegalArgumentException(); // the wanted name already exist
+        }
+            else throw new ExceptionInInitializerError() ; // the wanted path doesnt exist
+     */
 
 
 
@@ -190,8 +234,8 @@ public class Runner {
                 out.println("Deleted Files's Paths:" + manager.getDeletedFile());
                 out.println("Added Files's Paths:" + manager.getCreatedFiles());
                 out.println("Updated Files's Paths:" + manager.getUpdatedFiles());
-            } catch (IOException e) {
-                out.println("Show Status Failed!");}
+            } catch (Exception e) {
+                out.println("Show Status Failed! Unable to create files");}
         } else {
             out.println("The is no repository defined!");
         }
@@ -227,12 +271,18 @@ public class Runner {
 
     }
 
+
     public boolean isOutOfRange(int min, int max, int val)
     {
-        if (val>=min && val<=max)
-            return true;
-        else throw new IndexOutOfBoundsException();
+        if (val>=min && val<=max )
+            return false;
+        return true;
     }
+
+    public boolean isNotNumber()
+    {
+        return true;
+    }
+
+
 }
-
-
