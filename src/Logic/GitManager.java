@@ -1,6 +1,8 @@
 package Logic;
 
 
+//import com.sun.jdi.request.ExceptionRequest;
+//import com.sun.tools.classfile.Code_attribute;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import java.io.*;
@@ -73,7 +75,7 @@ public class GitManager {
 
     }
 
-    public void ExecuteCommit(String description, Boolean isCreateZip) throws IOException {
+    public void ExecuteCommit(String description, Boolean isCreateZip) throws Exception {
         Path ObjectPath = Paths.get(GITRepository.getRepositoryPath().toString() + "\\.magit\\Objects");
         Path BranchesPath = Paths.get(GITRepository.getRepositoryPath().toString() + "\\.magit\\Branches");
         String headBranch = readTextFile(BranchesPath + "\\Head");
@@ -93,7 +95,9 @@ public class GitManager {
                 GITRepository.getHeadBranch().getPointedCommit().setOrigCommit(newFolder);
                 GITRepository.getCommitList().add(GITRepository.getHeadBranch().getPointedCommit());
                 GITRepository.getHeadBranch().getPointedCommit().setCommitFileContentToSHA();
-                createFileInMagit(GITRepository.getHeadBranch().getPointedCommit(),GITRepository.getRepositoryPath());
+                try{
+                createFileInMagit(GITRepository.getHeadBranch().getPointedCommit(),GITRepository.getRepositoryPath());}
+                catch (Exception e) {throw new Exception();}
             }
         }
     }
@@ -274,12 +278,14 @@ public class GitManager {
 
     }
 
-    public void createEmptyRepositoryFolders(String repPath, String repName) throws FileAlreadyExistsException,ArithmeticException {
+    public void createEmptyRepositoryFolders(String repPath, String repName)
+            throws ExceptionInInitializerError, IllegalArgumentException   {
         if (repPath.substring(repPath.length() - 1) != "/") {
             repPath += "\\";
         }
-        if (!Files.exists(Paths.get(repPath))){
-            if (!Files.exists(Paths.get(repPath + repName))) {
+        if (Files.exists(Paths.get(repPath)))//הpath קיים
+        {
+        if (!Files.exists(Paths.get(repPath + repName))) {
                 new File(repPath + repName + "\\.magit\\objects").mkdirs();
                 new File(repPath + repName + "\\.magit\\branches").mkdirs();
                 Path workingPath = Paths.get(repPath + repName + "\\");
@@ -288,9 +294,10 @@ public class GitManager {
                 GITRepository.getHeadBranch().getPointedCommit().setRootfolder(workingPath.toString());
                 GITRepository.getHeadBranch().getPointedCommit().setCommitFileContentToSHA();
 //Create commit file
-
+                try{
                 createFileInMagit(GITRepository.getHeadBranch().getPointedCommit(), workingPath);//commit
-                createFileInMagit(GITRepository.getHeadBranch(), workingPath);
+                createFileInMagit(GITRepository.getHeadBranch(), workingPath);}
+                catch (Exception e) {System.out.println("File creation failed");}
                 createFile("Head", "Master", Paths.get(repPath + repName + "\\.magit\\branches"));
 
                 GITRepository.setBranchByName("Master").setPointedCommit(GITRepository.getHeadBranch().getPointedCommit());
@@ -300,14 +307,13 @@ public class GitManager {
                 GITRepository.getHeadBranch().getPointedCommit().setOrigCommit(folder);
                 this.userName = "Ädministrator";
                 GITRepository.getHeadBranch().getPointedCommit().setOrigCommit(folder);
-            } else throw new FileAlreadyExistsException("");
-        } else throw new ArithmeticException();
+            }   else throw new IllegalArgumentException(); // the wanted name already exist
+        }
+            else throw new ExceptionInInitializerError() ; // the wanted path doesnt exist
     }
 
-
-
-
-    public void switchRepository(Path newRepPath) throws Exception {
+//מכאן רוצה להוציא שני אקספשנס שונים שכל אחד יסמל בעיה אחרת
+    public void switchRepository(Path newRepPath) throws ExceptionInInitializerError, IllegalArgumentException  {
         Path checkIfMagit = Paths.get(newRepPath + "\\.magit");
         if (Files.exists(newRepPath)) {
             if (Files.exists(checkIfMagit)) {
@@ -319,9 +325,9 @@ public class GitManager {
                 GITRepository.Switch(newRepPath);
                 //GITRepository.getRepositoryName() = ךהחליף שם של רפוסיטורי
                 //לא יצרנו קומיט שההד יצביע עליו כי אין צורך
-            } else throw new Exception();//exeption forG not being magit
+            } else throw new ExceptionInInitializerError();//exeption forG not being magit
 
-        } else throw new Exception();//exception for not existing
+        } else throw new IllegalArgumentException();//exception for not existing
 
         //create origcommit
         Folder folder = GenerateFolderSha1(GITRepository.getRepositoryPath(), GitManager.getDate());
@@ -330,18 +336,17 @@ public class GitManager {
 
 
     public void CreateNewBranch(String newBranchName) throws FileAlreadyExistsException {
-        for (Branch X : GITRepository.getBranches()) {
-            if (X.getBranchName() == newBranchName) {
-                throw new FileAlreadyExistsException("This Branch is already exist!");
-            } else {
-                Branch newB = new Branch(newBranchName);
-                GITRepository.getBranches().add(newB);
-                newB.setPointedCommit(GITRepository.getHeadBranch().getPointedCommit());
+        for (Branch b : GITRepository.getBranches()) {//או זה
+            if (b.getBranchName() == newBranchName) {//או זה לא עובדים. אפשר לראות את זה כשבאים להוסיף בראנצ חדש בעל שם שכבר קיים בבראנצים, והוא לא באמת מוצא אותו. כאילו שלא מקבל את השם שלו
+                throw new FileAlreadyExistsException("");
             }
         }
+        Branch newB = new Branch(newBranchName);
+        GITRepository.getBranches().add(newB);
+        newB.setPointedCommit(GITRepository.getHeadBranch().getPointedCommit());
     }
 
-    private static void createFileInMagit(Object obj, Path path) {// throws IOException
+    private static void createFileInMagit(Object obj, Path path) throws Exception {
         Class objClass = obj.getClass();
         Path magitPath = Paths.get(path.toString() + "\\.magit");
         Path objectsPath = Paths.get(magitPath.toString() + "\\objects");
@@ -357,9 +362,11 @@ public class GitManager {
         } else if (Blob.class.equals(objClass)) {
             createBlobZip((Blob) obj, objectsPath);
         }
+        else throw new Exception();
+
     }
 
-    private static void createCommitZip(Commit commit, Path path)  {//throws IOException
+    private static void createCommitZip(Commit commit, Path path) throws IOException {
 //        String content = commit.getCommitFileContent();
 //        StringBuilder b = new StringBuilder();
 //        b.append(GitManager.generateSHA1FromString(path.toString()));
@@ -373,14 +380,14 @@ public class GitManager {
     }
 
 
-    private static void createFolderZip(Folder folder, Path path) {//throws IOException
+    private static void createFolderZip(Folder folder, Path path) throws IOException {
         String content = folder.stringComponentsToString();
         String SHA = generateSHA1FromString(content);
 
         createZipFile(path, SHA, content);
     }
 
-    private static void createBlobZip(Blob blob, Path path) { throws IOException
+    private static void createBlobZip(Blob blob, Path path) throws IOException {
         String content = blob.getContent();
         String SHA = generateSHA1FromString(content);
 
