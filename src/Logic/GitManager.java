@@ -230,7 +230,11 @@ public class GitManager {
                     fileContent = readTextFile(f.toString());
                     sh1Hex = generateSHA1FromString((fileContent));
                     //לוגית יוצרת את האובייקט שהוא קומפוננט שמתאר בלוב
-                    currentFolder.getComponents().add(new Folder.Component(f.getName(), sh1Hex, FolderType.Blob , userName, dateModified));
+                    Folder.Component newComponent = new Folder.Component(f.getName(), sh1Hex, FolderType.Blob, userName, dateModified);
+                    newComponent.setDirectObject(new Blob(fileContent));
+                    currentFolder.getComponents().add(newComponent);
+
+                    return currentFolder;
                     //objects פיזית בתוך התיקייה
                     /*try {
                         createBlobZip(new Blob(fileContent), currentPath);
@@ -241,6 +245,11 @@ public class GitManager {
                 } else {
                     Folder folder = GenerateFolderSha1(Paths.get(f.getPath()), dateModified);
                     sh1Hex = generateSHA1FromString(folder.stringComponentsToString());
+
+                    Folder.Component newComponent = new Folder.Component(f.getName(), sh1Hex, FolderType.Folder, userName, dateModified);
+                    newComponent.setDirectObject(new Folder(folder.getComponents()));
+                    currentFolder.getComponents().add(newComponent);
+
                     currentFolder.getComponents().add(new Folder.Component(
                             f.getName(), sh1Hex, FolderType.Folder, userName, dateModified));
 
@@ -252,9 +261,9 @@ public class GitManager {
                     //נעשה את החלק הזה במקרה שבו התיקייה או הקובץ השתנו (התעדכנה או נוספה)
                 }
             }
-        }
-        Collections.sort(currentFolder.getComponents());
 
+            Collections.sort(currentFolder.getComponents());
+        }
         return currentFolder;
     }
 

@@ -7,7 +7,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Folder {
+public class Folder implements FileObject{
     //private  Integer folderID;
     //private String blobName;
     //private String sha1;//content
@@ -25,14 +25,24 @@ public class Folder {
         components = new ArrayList<>();
         components.add(c);
     }
+    public Folder(ArrayList<Component> list) {
+        components = list;
+    }
 
-
-    protected static class Component implements Comparable<Component>{
+    protected static class Component implements Comparable<Component> , FileObject{
         private FolderType type;
         private String Sha1;
         private String name;
         private String lastUpdater;
         private String lastUpdateDate;
+        private FileObject directObject;
+
+
+        public void setDirectObject(FileObject directObject) {
+            this.directObject = directObject;
+        }
+
+
 
         public Component(String name, String sha1, FolderType type, String lastUpdater, String lastUpdateDate){
 
@@ -49,15 +59,15 @@ public class Folder {
         public int compareTo(Component folderComponent) {
             return this.name.compareTo(folderComponent.name);
         }
-    public FolderType getComponentType()
-    {return type;}
-    public String getComponentSHA1()
-    { return Sha1;}
-        public String  getComponentName()
-        {return name;}
-        public String  getFolderSHA1()
-        {return Sha1;}
+        public FolderType getComponentType() {return type;}
+        public String getComponentSHA1() { return Sha1;}
+        public String  getComponentName() {return name;}
+        public String  getFolderSHA1() {return Sha1;}
 
+        public void createObj()
+        {
+
+        }
 
         public String getComponentsString() {
             StringBuilder content = new StringBuilder();

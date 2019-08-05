@@ -1,6 +1,6 @@
 package Logic;
 
-public class  Blob {
+public class  Blob  implements FileObject{
 
     private String content;
 
@@ -27,5 +27,8 @@ public class  Blob {
         return content;
     }
 
-
+//public void createObj()
+//{
+//
+//}
 }
