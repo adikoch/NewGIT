@@ -152,6 +152,8 @@ public class Runner {
         }
         catch (IllegalArgumentException er) {
             out.println("The path does not exist");
+        } catch (IOException e) {
+            out.println("One of the file does noe available");
         }
     }
 
@@ -267,7 +269,7 @@ public class Runner {
         out.println("Please enter the name of the branch you would like to delete");
         String branchName = sc.nextLine();
 
-        manager.deleteBranchfromRepository(branchName);
+        manager.deleteBranchFromRepository(branchName);
 
     }
 

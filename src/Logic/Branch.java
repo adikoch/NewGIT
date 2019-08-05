@@ -7,12 +7,21 @@ public class Branch {
     Boolean isRemote;
 
    private String branchName;
-    private Boolean isMaster;
     private Commit pointedCommit;
+    private  String pointedCommitSHA1;
+
+    public void setPointedCommitSHA1(String pointedCommitSHA1) {
+        this.pointedCommitSHA1 = pointedCommitSHA1;
+    }
 
     public Branch(String name)
     {
         branchName = name;
+    }
+    public Branch(String name,String commitSHA1)
+    {
+        branchName = name;
+        pointedCommitSHA1 = commitSHA1;
     }
 
     public String getBranchName()

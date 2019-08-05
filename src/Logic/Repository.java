@@ -1,6 +1,8 @@
 package Logic;
 
+import java.io.File;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 public class Repository {
@@ -29,7 +31,7 @@ public class Repository {
         branches.add(headBranch);
         head = headBranch;
         repositoryName = "EmptyRepository";
-
+        commitList = new LinkedList<>();
     }
     public  String getRepositoryName(){ return repositoryName; }
     public  Path getRepositoryPath(){ return path; }
@@ -55,6 +57,23 @@ public class Repository {
 
     }
 
+    public void GITRepositorygetRepositorysBranchesObjecets()
+    {
+        String objectsPath = path + "\\.magit\\Objects";
+        Path BranchesPath = Paths.get(path.toString() + "\\.magit\\Branches");
+        File[] allBranches = BranchesPath.toFile().listFiles();
+        String fileContent = "";
+
+        for (File f : allBranches) {
+            if (!f.getName().equals("Head")) {
+                if(!f.getName().equals(this.head.getBranchName())) {
+                    fileContent = GitManager.readTextFile(f.toString());
+                    this.branches.add(new Branch(f.getName(), fileContent));
+                }
+            }
+
+        }
+    }
     /*public void setBranchByName(String name)
     {
         for(Branch b:branches) {

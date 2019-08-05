@@ -7,11 +7,16 @@ import java.io.File;
 import java.nio.file.Path;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 
 public class Commit {
     private String SHA1;
+
+
+
+
     private Folder rootFolder;
     private String rootFolderPathName;// main library repository
     private String SHA1PreveiousCommit;
@@ -38,14 +43,26 @@ public class Commit {
         changer= userName;
     }
 
-    public Commit(File file)
+    public Commit(ArrayList<String> args, Path path)
     {
-
+          rootFolderPathName = path.toString();// main library repository
+          SHA1PreveiousCommit = args.get(1);
+          SHA1PrevPrevCommit = args.get(2);
+          description = args.get(3);
+          creationDate = args.get(4);
+          changer = args.get(5);
     }
 
 
     // getters, setters
 
+
+    public void setRootFolder(Folder rootFolder) {
+        this.rootFolder = rootFolder;
+    }
+    public void setRootFolderPathName(String rootFolderPathName) {
+        this.rootFolderPathName = rootFolderPathName;
+    }
     public String getSHA1PreveiousCommit() {
         return SHA1PreveiousCommit;
     }
