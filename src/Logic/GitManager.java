@@ -336,14 +336,15 @@ public class GitManager {
 
 
     public void CreateNewBranch(String newBranchName) throws FileAlreadyExistsException {
-        for (Branch b : GITRepository.getBranches()) {//או זה
-            if (b.getBranchName() == newBranchName) {//או זה לא עובדים. אפשר לראות את זה כשבאים להוסיף בראנצ חדש בעל שם שכבר קיים בבראנצים, והוא לא באמת מוצא אותו. כאילו שלא מקבל את השם שלו
+        for (Branch X : GITRepository.getBranches()) {
+            if (X.getBranchName() == newBranchName) {
                 throw new FileAlreadyExistsException("");
+            } else {
+                Branch newB = new Branch(newBranchName);
+                GITRepository.getBranches().add(newB);
+                newB.setPointedCommit(GITRepository.getHeadBranch().getPointedCommit());
             }
         }
-        Branch newB = new Branch(newBranchName);
-        GITRepository.getBranches().add(newB);
-        newB.setPointedCommit(GITRepository.getHeadBranch().getPointedCommit());
     }
 
     private static void createFileInMagit(Object obj, Path path) throws Exception {

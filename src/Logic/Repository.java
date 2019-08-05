@@ -44,7 +44,7 @@ public class Repository {
         path = newPath;
     }
 
-    public Branch getBranchByName(String name)
+    public Branch setBranchByName(String name)
     {
         Branch newBranch = null;
         for(Branch b:branches) {
@@ -55,10 +55,10 @@ public class Repository {
 
     }
 
-    public void setBranchByName(String name)
+    /*public void setBranchByName(String name)
     {
         for(Branch b:branches) {
             if (b.getBranchName().equals(name))
                 head = b;}
-    }
+    }*/
 }
