@@ -90,11 +90,13 @@ public class GitManager {
 
 
             if (isCreateZip) {
-                GITRepository.getHeadBranch().setPointedCommit(new Commit(description, userName));
-                GITRepository.getHeadBranch().getPointedCommit().setSHA1PreveiousCommit(prevCommitSHA1);
-                GITRepository.getHeadBranch().getPointedCommit().setOrigCommit(newFolder);
-                GITRepository.getCommitList().add(GITRepository.getHeadBranch().getPointedCommit());
-                GITRepository.getHeadBranch().getPointedCommit().setCommitFileContentToSHA();
+                GITRepository.getHeadBranch().setPointedCommit(new Commit(description, userName)); //creation
+                GITRepository.getHeadBranch().getPointedCommit().setSHA1PreveiousCommit(prevCommitSHA1); //setting old commits sha1
+                GITRepository.getHeadBranch().getPointedCommit().setOrigCommit(newFolder); //setting old commit
+                GITRepository.getCommitList().add(GITRepository.getHeadBranch().getPointedCommit()); //adding to commits list of the current reposetory
+                GITRepository.getHeadBranch().getPointedCommit().setCommitFileContentToSHA(); //
+                // adding the user name of reposetory to the commit
+
                 try{
                 createFileInMagit(GITRepository.getHeadBranch().getPointedCommit(),GITRepository.getRepositoryPath());}
                 catch (Exception e) {throw new Exception();}
@@ -102,23 +104,23 @@ public class GitManager {
         }
     }
 
-    private void createShaAndZipForNewCommit(Folder newFolder,Folder oldFolder, Boolean isCreateZip, Path path) {
+    private void createShaAndZipForNewCommit(Folder newFolder, Folder oldFolder, Boolean isCreateZip, Path path) {
         ArrayList<Folder.Component> newComponents = newFolder.getComponents();
         ArrayList<Folder.Component> oldComponents = oldFolder.getComponents();
         int oldd = 0;
-        int neww = 0;
+        int neww = 0;// indexes of the component in the lists
 
         // for (int i=0 , j=0; i<= newComponents.size() && j<=oldComponents.size(); i++) {
-        while (oldd < oldComponents.size() && neww < newComponents.size()) {
-            if (!newComponents.get(neww).getComponentName().equals(".magit")) {
-                if (!oldComponents.get(oldd).getComponentName().equals(".magit")) {
+        while (oldd < oldComponents.size() && neww < newComponents.size()) { // while two folders are not empty
+            if (!newComponents.get(neww).getComponentName().equals(".magit")) { //for each component at new
+                if (!oldComponents.get(oldd).getComponentName().equals(".magit")) { //for each component at old
 
-                    if (oldComponents.get(oldd).getComponentName().equals(newComponents.get(neww).getComponentName())) {
-                        if (oldComponents.get(oldd).getComponentSHA1().equals(newComponents.get(neww).getComponentSHA1())) {
+                    if (oldComponents.get(oldd).getComponentName().equals(newComponents.get(neww).getComponentName())) { // if names are the same
+                        if (oldComponents.get(oldd).getComponentSHA1().equals(newComponents.get(neww).getComponentSHA1())) { //if sha1 is the same
                             //point old object
-                            newComponents.set(neww, oldComponents.get(oldd));
+                            newComponents.set(neww, oldComponents.get(oldd)); // if nothing changed, point at the original tree
                             return;
-                        } else if (oldComponents.get(oldd).getComponentType().equals(newComponents.get(neww).getComponentType())) {
+                        } else if (oldComponents.get(oldd).getComponentType().equals(newComponents.get(neww).getComponentType())) { //different sha1, updated file
                             if (oldComponents.get(oldd).getComponentType().equals(FolderType.Folder)) {
                                 Folder newF = new Folder(newComponents.get(neww));
                                 Folder oldF = new Folder(oldComponents.get(oldd));
@@ -322,10 +324,12 @@ public class GitManager {
     }
 
 //מכאן רוצה להוציא שני אקספשנס שונים שכל אחד יסמל בעיה אחרת
-    public void switchRepository(Path newRepPath) throws ExceptionInInitializerError, IOException, IllegalArgumentException  {
+    public void switchRepository(Path newRepPath)
+            throws ExceptionInInitializerError, UnsupportedOperationException, IllegalArgumentException, IOException  {
         Path checkIfMagit = Paths.get(newRepPath + "\\.magit");
         if (Files.exists(newRepPath)) {
             if (Files.exists(checkIfMagit)) {
+
                 File f = Paths.get(newRepPath.toString() + "\\.magit\\branches\\Head").toFile();
                 String content = readTextFile(newRepPath + "\\.magit\\branches\\" + f.getName());
                 String name = readTextFile(newRepPath + "\\.magit\\branches\\" + content);
@@ -419,7 +423,8 @@ public class GitManager {
 
         createZipFile(path, SHA, content);
     }
-    public static String extractZipFile(Path path, String fileName)throws IOException {
+    public static String extractZipFile(Path path, String fileName) throws IOException
+    {
         ZipFile zip = new ZipFile(path.toString());
         ZipEntry entry = zip.entries().nextElement();
         StringBuilder out = getTxtFiles(zip.getInputStream(entry));

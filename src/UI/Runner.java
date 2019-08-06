@@ -51,13 +51,14 @@ public class Runner {
         {
             if (isValid) menu.show();
             userInput=scanInput.nextLine();
-            try{result = Integer.parseInt(userInput);}
+            try{
+                result = Integer.parseInt(userInput);
+                isNumber=true;}
             catch (NumberFormatException e) {isNumber= false;}
 
-            if(isNumber)
-            {
-                isValid=!isOutOfRange(1,13,result);
-            }
+
+           isValid=isNumber && !isOutOfRange(1,13,result);
+
             if(isValid)
                 sendToOption(result);
             else out.println("number out of bound! Please enter a valid input");
@@ -77,7 +78,7 @@ public class Runner {
                 break;
 
             case (3):
-                SwitchRepository();
+                SwitchRepository();//validation V
                 break;
 
             case (4):
@@ -113,7 +114,7 @@ public class Runner {
                 break;
 
             case (12):
-                createEmptyRepository();
+                createEmptyRepository();//validation V
                 break;
 
             case (13):
@@ -137,21 +138,27 @@ public class Runner {
     }
 
     private void SwitchRepository() {
+        boolean isValid= false;
         Scanner sb = new Scanner(System.in);
 
+        while(!isValid)
+        {
         System.out.println("Enter the new repository's path:");
         String NewRepositoryPathString = sb.nextLine();
         Path NewRepositoryPath = Paths.get(NewRepositoryPathString);
         try {
             manager.switchRepository(NewRepositoryPath);
+            isValid=true;
         }
         catch (ExceptionInInitializerError e) {
             out.println("This path is not a part of the magit system");
         }
         catch (IllegalArgumentException er) {
-            out.println("The path does not exist");
-        } catch (IOException e) {
-            out.println("One of the file does noe available");
+            out.println("The path does not exist, please try again");
+        } catch (UnsupportedOperationException err) {
+            out.println("One of the file does noe available, please try again");
+        }
+        catch (IOException errr) {out.println("Unable to zip the required file");}
         }
     }
 
