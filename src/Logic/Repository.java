@@ -14,7 +14,7 @@ public class Repository {
     private LinkedList<Commit> commitList = new LinkedList<Commit>();
 
 
-    public LinkedList<Commit> getCommitList() {
+    LinkedList<Commit> getCommitList() {
         return commitList;
     }
 
@@ -24,7 +24,7 @@ public class Repository {
     //String referenceNameLocation;
 
 
-    public Repository(Path workingPath, Branch headBranch)
+    Repository(Path workingPath, Branch headBranch)
     {
         path = workingPath;
         branches = new HashSet<>();
@@ -41,12 +41,12 @@ public class Repository {
 
     public Map<String,Path> getSHA1Map(){ return SHA1Map;}
 
-    public void Switch(Path newPath)
+    void Switch(Path newPath)
     {
         path = newPath;
     }
 
-    public Branch setBranchByName(String name)
+    Branch setBranchByName(String name)
     {
         Branch newBranch = null;
         for(Branch b:branches) {
@@ -57,7 +57,7 @@ public class Repository {
 
     }
 
-    public void GITRepositorygetRepositorysBranchesObjecets()
+    void getRepositorysBranchesObjecets()
     {
         String objectsPath = path + "\\.magit\\Objects";
         Path BranchesPath = Paths.get(path.toString() + "\\.magit\\Branches");

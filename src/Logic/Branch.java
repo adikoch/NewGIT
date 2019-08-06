@@ -10,15 +10,15 @@ public class Branch {
     private Commit pointedCommit;
     private  String pointedCommitSHA1;
 
-    public void setPointedCommitSHA1(String pointedCommitSHA1) {
-        this.pointedCommitSHA1 = pointedCommitSHA1;
+    void setPointedCommitSHA1(String pointedCommit) {
+        pointedCommitSHA1 = pointedCommit;
     }
 
-    public Branch(String name)
+    Branch(String name)
     {
         branchName = name;
     }
-    public Branch(String name,String commitSHA1)
+    Branch(String name, String commitSHA1)
     {
         branchName = name;
         pointedCommitSHA1 = commitSHA1;
@@ -34,7 +34,7 @@ public class Branch {
         return pointedCommit;
     }
 
-    public void setPointedCommit(Commit newC)
+    void setPointedCommit(Commit newC)
     {
         pointedCommit=newC;
     }

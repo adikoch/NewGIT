@@ -21,12 +21,12 @@ public class Folder implements FileObject{
     private ArrayList<Component> components;
     //private String SHA1;
 
-    public Folder(Component c)
+    Folder(Component c)
     {
         components = new ArrayList<>();
         components.add(c);
     }
-    public Folder(ArrayList<Component> list) {
+    Folder(ArrayList<Component> list) {
         components = list;
     }
 
@@ -39,17 +39,16 @@ public class Folder implements FileObject{
         private FileObject directObject;
 
 
-        public void setDirectObject(FileObject directObject) {
+        void setDirectObject(FileObject directObject) {
             this.directObject = directObject;
         }
 
 
-
-        public Component(String name, String sha1, FolderType type, String lastUpdater, String lastUpdateDate){
+        Component(String name, String sha1, FolderType type, String lastUpdater, Long lastUpdateDate){
 
             this.type= type;
             this.name=name;
-            this.lastUpdateDate=lastUpdateDate;
+            this.lastUpdateDate=lastUpdateDate.toString();
             this.Sha1=sha1;
             this.lastUpdater=lastUpdater;
 
@@ -60,17 +59,17 @@ public class Folder implements FileObject{
         public int compareTo(Component folderComponent) {
             return this.name.compareTo(folderComponent.name);
         }
-        public FolderType getComponentType() {return type;}
-        public String getComponentSHA1() { return Sha1;}
-        public String  getComponentName() {return name;}
-        public String  getFolderSHA1() {return Sha1;}
+        FolderType getComponentType() {return type;}
+        String getComponentSHA1() { return Sha1;}
+        String  getComponentName() {return name;}
+        String  getFolderSHA1() {return Sha1;}
 
-        public void createObj()
-        {
+//        public void createObj()
+//        {
+//
+//        }
 
-        }
-
-        public String getComponentsString() {
+        String getComponentsString() {
             StringBuilder content = new StringBuilder();
             content.append(name);
             content.append(",");
@@ -86,7 +85,7 @@ public class Folder implements FileObject{
         }
     }
 
-    public String stringComponentsToString() {
+    String stringComponentsToString() {
         StringBuilder content = new StringBuilder();
         for (Component a : components) {
             content.append(a.getComponentsString());
@@ -95,7 +94,7 @@ public class Folder implements FileObject{
         return content.toString();
     }
 
-    public Folder() // creating by XML or new empty root
+    Folder() // creating by XML or new empty root
     {
         //SHA1 = org.apache.commons.codec.digest.DigestUtils.sha1Hex("");
         components = new ArrayList<>();
@@ -121,12 +120,12 @@ public class Folder implements FileObject{
 
     }
 
-    public ArrayList<Component> getComponents() {
+    ArrayList<Component> getComponents() {
         return this.components;
     }
 
 
-    public String getFolderContentString() {
+    String getFolderContentString() {
         StringBuilder sb = new StringBuilder();
 
         for(Component c: components) {

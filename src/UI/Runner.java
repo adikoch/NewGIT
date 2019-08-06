@@ -1,6 +1,5 @@
 package UI;
 import Logic.Branch;
-import Logic.Commit;
 import Logic.GitManager;
 //import org.graalvm.compiler.core.CompilationWrapper;
 
@@ -10,7 +9,6 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Scanner;
 
 import static java.lang.System.lineSeparator;
@@ -226,7 +224,7 @@ public class Runner {
 
 
 
-    public void ShowStatus() {
+    void ShowStatus() {
         if (manager.getGITRepository() != null) {
             out.println("Repository's Name:" + manager.getGITRepository().getRepositoryName());
             out.println("Repository's Path:" + manager.getGITRepository().getRepositoryPath().toString());
@@ -245,7 +243,7 @@ public class Runner {
 
     }
 
-    public void ShowAllBranches() {
+    void ShowAllBranches() {
         if (manager.getGITRepository() != null) {
             HashSet<Branch> branches = manager.getGITRepository().getBranches();
             for (Branch b : branches) {
@@ -262,7 +260,7 @@ public class Runner {
         }
 
     }
-    public  void DeleteBranch()
+    void DeleteBranch()
     {
         Scanner sc = new Scanner(System.in);
 
@@ -274,7 +272,7 @@ public class Runner {
     }
 
 
-    public boolean isOutOfRange(int min, int max, int val)
+    private static boolean isOutOfRange(int min, int max, int val)
     {
         if (val>=min && val<=max )
             return false;
