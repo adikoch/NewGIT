@@ -36,8 +36,12 @@ public class Folder implements FileObject{
         private String name;
         private String lastUpdater;
         private String lastUpdateDate;
+
         private FileObject directObject;
 
+        public FileObject getDirectObject() {
+            return directObject;
+        }
 
         void setDirectObject(FileObject directObject) {
             this.directObject = directObject;

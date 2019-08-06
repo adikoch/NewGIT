@@ -83,30 +83,33 @@ public class GitManager {
         //Date
         //String creationDate = GitManager.getDate();
 
-        Folder newFolder = GenerateFolderSha1(GITRepository.getRepositoryPath());// ייצג את הספרייה הראשית
+        Folder newFolder = GenerateFolder(GITRepository.getRepositoryPath());// ייצג את הספרייה הראשית
         Folder oldFolder = GITRepository.getHeadBranch().getPointedCommit().getRootfolder();
         if(!generateSHA1FromString(newFolder.getFolderContentString()).equals(generateSHA1FromString(oldFolder.getFolderContentString()))) {
             createShaAndZipForNewCommit(newFolder, oldFolder, isCreateZip, GITRepository.getRepositoryPath());
 
 
             if (isCreateZip) {
-                GITRepository.getHeadBranch().setPointedCommit(new Commit(description, userName)); //creation
+                Commit c = new Commit(description, userName);
+                GITRepository.getHeadBranch().setPointedCommit(c); //creation
                 GITRepository.getHeadBranch().getPointedCommit().setSHA1PreveiousCommit(prevCommitSHA1); //setting old commits sha1
                 GITRepository.getHeadBranch().getPointedCommit().setOrigCommit(newFolder); //setting old commit
                 GITRepository.getCommitList().add(GITRepository.getHeadBranch().getPointedCommit()); //adding to commits list of the current reposetory
                 GITRepository.getHeadBranch().getPointedCommit().setCommitFileContentToSHA(); //
-                // adding the user name of reposetory to the commit
+                createFile(GITRepository.getHeadBranch().getBranchName(), GITRepository.getHeadBranch().getPointedCommit().getSHA(), BranchesPath);
+                GITRepository.getHeadBranch().setPointedCommitSHA1(c.getSHA());
 
-                try{
+                    try{
                 createFileInMagit(GITRepository.getHeadBranch().getPointedCommit(),GITRepository.getRepositoryPath());}
                 catch (Exception e) {throw new Exception();}
             }
         }
     }
 
-    private void createShaAndZipForNewCommit(Folder newFolder, Folder oldFolder, Boolean isCreateZip, Path path) {
+    private void createShaAndZipForNewCommit(Folder newFolder, Folder oldFolder, Boolean isCreateZip, Path path) throws IOException {
         ArrayList<Folder.Component> newComponents = newFolder.getComponents();
         ArrayList<Folder.Component> oldComponents = oldFolder.getComponents();
+        Path objectPath  = Paths.get(path.toString() + "\\.magit\\Objects");
         int oldd = 0;
         int neww = 0;// indexes of the component in the lists
 
@@ -125,9 +128,12 @@ public class GitManager {
                                 Folder newF = new Folder(newComponents.get(neww));
                                 Folder oldF = new Folder(oldComponents.get(oldd));
                                 createShaAndZipForNewCommit(newF, oldF, isCreateZip, Paths.get(path.toString() + "\\" + oldComponents.get(oldd).getComponentName()));
+                                createZipFile(objectPath,generateSHA1FromString(newF.getFolderContentString()),newF.getFolderContentString());
+
                             } else {
                                 //both blob - updated
-                                //createZipFile(path,newComponents.get(neww).getComponentSHA1(),newComponents.get(neww).);
+                                Blob b = (Blob)newComponents.get(neww).getDirectObject();
+                                createZipFile(objectPath,newComponents.get(neww).getComponentSHA1(),b.getContent());
                                 //add updated file zip
                                 //add to path
                                 this.updatedFiles.add(Paths.get(path.toString() + "\\" + newComponents.get(neww).getComponentName()));
@@ -136,15 +142,16 @@ public class GitManager {
                         } else {
                             //one blob one folder - one of them was created with the same name(diff type now)
                             //add new file creeate zip
-                            //createZipFile(path,newComponents.get(neww).getComponentSHA1(),newComponents.get(neww).);
 
-                            //add to list
-                            this.createdFiles.add(Paths.get(path.toString() + "\\" + newComponents.get(neww).getComponentName()));
-                            neww++;
+//                            createZipFile(path,newComponents.get(neww).getComponentSHA1(),newComponents.get(neww).getDirectObject().);
+//
+//                            //add to list
+//                            this.createdFiles.add(Paths.get(path.toString() + "\\" + newComponents.get(neww).getComponentName()));
+//                            neww++;
                         }
                     } else {
                         int result = newComponents.get(neww).getComponentName().compareTo(oldComponents.get(oldd).getComponentName());
-                        if (result < 0) {
+                        if (result > 0) {
                             //file was deleted from old
                             oldd++;
                             //add to list
@@ -170,8 +177,22 @@ public class GitManager {
             oldd++;
         }
         while ( neww < newComponents.size()) {
+            if(newComponents.get(neww).getComponentType().equals(FolderType.Blob))
+            {
+                Blob b = (Blob)newComponents.get(neww).getDirectObject();
+                createZipFile(objectPath,newComponents.get(neww).getComponentSHA1(),b.getContent());
+            }
+            else
+            {
+                Folder f = new Folder( newComponents.get(neww));
+                createShaAndZipForNewCommit(f, null, isCreateZip, Paths.get(path.toString() + "\\" + oldComponents.get(oldd).getComponentName()));
+                createZipFile(objectPath,generateSHA1FromString(f.getFolderContentString()),f.getFolderContentString());
+
+            }
             this.createdFiles.add(Paths.get(path.toString() + "\\" + newComponents.get(neww).getComponentName()));
             neww++;
+
+
 
         }
     }
@@ -223,7 +244,7 @@ public class GitManager {
 //        }
 
 
-    private Folder GenerateFolderSha1(Path currentPath) {
+    private Folder GenerateFolder(Path currentPath) {
         File[] allFileComponents = currentPath.toFile().listFiles();
         String sh1Hex = "";
         String fileContent = "";
@@ -240,32 +261,14 @@ public class GitManager {
                     newComponent.setDirectObject(new Blob(fileContent));
                     currentFolder.getComponents().add(newComponent);
 
-                    return currentFolder;
-                    //objects פיזית בתוך התיקייה
-                    /*try {
-                        createBlobZip(new Blob(fileContent), currentPath);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                     */
                 } else {
-                    Folder folder = GenerateFolderSha1(Paths.get(f.getPath()));
+                    Folder folder = GenerateFolder(Paths.get(f.getPath()));
                     sh1Hex = generateSHA1FromString(folder.stringComponentsToString());
 
                     Folder.Component newComponent = new Folder.Component(f.getName(), sh1Hex, FolderType.Folder, userName, f.lastModified());
                     newComponent.setDirectObject(new Folder(folder.getComponents()));
                     currentFolder.getComponents().add(newComponent);
                     Collections.sort(currentFolder.getComponents());
-
-//                    currentFolder.getComponents().add(new Folder.Component(
-//                            f.getName(), sh1Hex, FolderType.Folder, userName, dateModified));
-
-                    /*try {
-                        createFolderZip(folder, Paths.get(objectsPath));
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }*/
-                    //נעשה את החלק הזה במקרה שבו התיקייה או הקובץ השתנו (התעדכנה או נוספה)
                 }
             }
         }
@@ -304,7 +307,7 @@ public class GitManager {
                 GITRepository.getHeadBranch().getPointedCommit().setRootfolder(workingPath.toString());
                 GITRepository.getHeadBranch().getPointedCommit().setCommitFileContentToSHA();
                 GITRepository.getHeadBranch().setPointedCommitSHA1(GITRepository.getHeadBranch().getPointedCommit().getSHA());
-//Create commit file
+                //Create commit file
                 try{
                 createFileInMagit(GITRepository.getHeadBranch().getPointedCommit(), workingPath);//commit
                 createFileInMagit(GITRepository.getHeadBranch(), workingPath);}
@@ -314,7 +317,7 @@ public class GitManager {
                 GITRepository.setBranchByName("Master").setPointedCommit(GITRepository.getHeadBranch().getPointedCommit());
 
 //            //create origcommit
-                Folder folder = GenerateFolderSha1(GITRepository.getRepositoryPath());
+                Folder folder = GenerateFolder(GITRepository.getRepositoryPath());
                 GITRepository.getHeadBranch().getPointedCommit().setOrigCommit(folder);
                 this.userName = "Ädministrator";
                 GITRepository.getHeadBranch().getPointedCommit().setOrigCommit(folder);
@@ -348,7 +351,7 @@ public class GitManager {
                 }
                 Commit newCommit = new Commit(st, newRepPath);
                 newCommit.setCommitFileContentToSHA();
-                newCommit.setRootFolder(GenerateFolderSha1(newRepPath));
+                newCommit.setRootFolder(GenerateFolder(newRepPath));
 
                 GITRepository.getHeadBranch().setPointedCommit(newCommit);
                 this.GITRepository.getRepositorysBranchesObjecets();
@@ -359,7 +362,7 @@ public class GitManager {
         } else throw new IllegalArgumentException();//exception for not existing
 
         //create origcommit
-        Folder folder = GenerateFolderSha1(GITRepository.getRepositoryPath());
+        Folder folder = GenerateFolder(GITRepository.getRepositoryPath());
         GITRepository.getHeadBranch().getPointedCommit().setOrigCommit(folder);
     }
 
@@ -476,6 +479,7 @@ public class GitManager {
             }
         }
     }
+
 
     public void deleteBranchFromRepository(String branchName) {
         Branch b = GITRepository.setBranchByName(branchName);

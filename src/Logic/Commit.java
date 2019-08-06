@@ -109,12 +109,12 @@ public class Commit {
     public void setCommitFileContentToSHA() {
         String delimiter = ", ";
         StringBuilder s = new StringBuilder();
-if(rootFolder != null) {
-    s.append(GitManager.generateSHA1FromString(rootFolder.getFolderContentString()));
-}
-else {
-    s.append(GitManager.generateSHA1FromString(""));
-}
+        if(rootFolder != null) {
+         s.append(GitManager.generateSHA1FromString(rootFolder.getFolderContentString()));
+            }
+            else {
+           s.append(GitManager.generateSHA1FromString(""));
+            }
         s.append(System.lineSeparator());
         s.append(getSHA1PreveiousCommit());
         s.append(System.lineSeparator());
