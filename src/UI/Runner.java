@@ -173,6 +173,9 @@ public class Runner {
             manager.ExecuteCommit(description, true);
         } catch (Exception e) {
             out.println("Commit Failed! Unable to create files");}
+        out.println("Deleted Files's Paths:" + manager.getDeletedFile());
+        out.println("Added Files's Paths:" + manager.getCreatedFiles());
+        out.println("Updated Files's Paths:" + manager.getUpdatedFiles());
         manager.getCreatedFiles().clear();
         manager.getDeletedFile().clear();
         manager.getUpdatedFiles().clear();
