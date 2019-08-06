@@ -8,8 +8,8 @@ public class Repository {
    private Path path;
    private HashSet<Branch> branches;
    private Branch head;
-    private Map<String,Path> SHA1Map = new HashMap<String,Path>();
-    private LinkedList<Commit> commitList = new LinkedList<Commit>();
+    private Map<String,Path> SHA1Map = new HashMap<>();
+    private LinkedList<Commit> commitList = new LinkedList<>();
 
 
     public LinkedList<Commit> getCommitList() {
