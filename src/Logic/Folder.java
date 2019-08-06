@@ -2,12 +2,13 @@ package Logic;
 
 import java.io.File;
 import java.io.Serializable;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Folder {
+public class Folder implements FileObject{
     //private  Integer folderID;
     //private String blobName;
     //private String sha1;//content
@@ -20,25 +21,34 @@ public class Folder {
     private ArrayList<Component> components;
     //private String SHA1;
 
-    public Folder(Component c)
+    Folder(Component c)
     {
         components = new ArrayList<>();
         components.add(c);
     }
+    Folder(ArrayList<Component> list) {
+        components = list;
+    }
 
-
-    protected static class Component implements Comparable<Component>{
+    protected static class Component implements Comparable<Component> , FileObject{
         private FolderType type;
         private String Sha1;
         private String name;
         private String lastUpdater;
         private String lastUpdateDate;
+        private FileObject directObject;
 
-        public Component(String name, String sha1, FolderType type, String lastUpdater, String lastUpdateDate){
+
+        void setDirectObject(FileObject directObject) {
+            this.directObject = directObject;
+        }
+
+
+        Component(String name, String sha1, FolderType type, String lastUpdater, Long lastUpdateDate){
 
             this.type= type;
             this.name=name;
-            this.lastUpdateDate=lastUpdateDate;
+            this.lastUpdateDate=lastUpdateDate.toString();
             this.Sha1=sha1;
             this.lastUpdater=lastUpdater;
 
@@ -49,17 +59,17 @@ public class Folder {
         public int compareTo(Component folderComponent) {
             return this.name.compareTo(folderComponent.name);
         }
-    public FolderType getComponentType()
-    {return type;}
-    public String getComponentSHA1()
-    { return Sha1;}
-        public String  getComponentName()
-        {return name;}
-        public String  getFolderSHA1()
-        {return Sha1;}
+        FolderType getComponentType() {return type;}
+        String getComponentSHA1() { return Sha1;}
+        String  getComponentName() {return name;}
+        String  getFolderSHA1() {return Sha1;}
 
+//        public void createObj()
+//        {
+//
+//        }
 
-        public String getComponentsString() {
+        String getComponentsString() {
             StringBuilder content = new StringBuilder();
             content.append(name);
             content.append(",");
@@ -75,7 +85,7 @@ public class Folder {
         }
     }
 
-    public String stringComponentsToString() {
+    String stringComponentsToString() {
         StringBuilder content = new StringBuilder();
         for (Component a : components) {
             content.append(a.getComponentsString());
@@ -84,7 +94,7 @@ public class Folder {
         return content.toString();
     }
 
-    public Folder() // creating by XML or new empty root
+    Folder() // creating by XML or new empty root
     {
         //SHA1 = org.apache.commons.codec.digest.DigestUtils.sha1Hex("");
         components = new ArrayList<>();
@@ -110,12 +120,12 @@ public class Folder {
 
     }
 
-    public ArrayList<Component> getComponents() {
+    ArrayList<Component> getComponents() {
         return this.components;
     }
 
 
-    public String getFolderContentString() {
+    String getFolderContentString() {
         StringBuilder sb = new StringBuilder();
 
         for(Component c: components) {
