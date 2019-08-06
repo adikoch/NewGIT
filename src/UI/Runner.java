@@ -61,7 +61,7 @@ public class Runner {
 
             if(isValid)
                 sendToOption(result);
-            else out.println("number out of bound! Please enter a valid input");
+            else out.println("Please enter a valid input!");
         }
     }
 
@@ -98,7 +98,7 @@ public class Runner {
                 break;
 
             case (8):
-                CreatBranch();
+                CreatBranch();// יווצא קובץ חדש בתיקייה branches, שבתוכו יש את הsha1 שכרגע מוצבע ע"י הhead הנוכחי,וגם הקומיט הנוכחי יהיה כמוהו, ושהhead הנוכחי עכשיו יצביע על הbranch שעכשיו יצרתי, להוסיף את הbranch לוגית ברפוזטורי
                 break;
 
             case (9):
