@@ -22,26 +22,6 @@ public class Runner {
     //private LinkedList<Commit> CommitsList= new LinkedList<>();
 
 
- /*   public void run() {
-        boolean isValid=true;
-        MainMenu menu = new MainMenu();
-        String userInput = "1";
-        while (userInput !="13" || !isValid) {
-            if(isValid) menu.show();
-            try{
-            userInput = scanInput.nextLine();
-            isValid= !isOutOfRange(1,13,userInput);
-            }
-            catch(Exception e) {isValid=false;}
-            if(isValid)// קלט תקין
-            {
-                sendToOption(userInput);
-            }
-            else System.out.println("number out of bound! Please enter a valid input");
-        }
-    }*/
-
-
     public void run() {
         boolean isNumber=true, isValid=true;
         int result=0;
@@ -183,28 +163,9 @@ public class Runner {
 
     }
 
-    /*private void CreatBranch() {// יווצא קובץ חדש בתיקייה branches, שבתוכו יש את הsha1 שכרגע מוצבע ע"י הhead הנוכחי,וגם הקומיט הנוכחי יהיה כמוהו, ושהhead הנוכחי עכשיו יצביע על הbranch שעכשיו יצרתי, להוסיף את הbranch לוגית ברפוזטורי
 
-        boolean isValid=false;
-        if (manager.getGITRepository() != null) {
-            Scanner sc = new Scanner(System.in);
-            while(!isValid){
-                System.out.println("Enter the full name for the new branch: ");
-                String newBranchName = sc.nextLine();
-                try {
-                    manager.CreateNewBranch(newBranchName);
-                    isValid=true;
-                } catch (FileAlreadyExistsException ex) {
-                    System.out.println("The branch name already exist, please try again");
-                    isValid=false;
-                }
-            }
-    }   else {
-        out.println("There is no repository defined!");
-    }
-    }*/
 
-    private void CreatBranch() {// יווצא קובץ חדש בתיקייה branches, שבתוכו יש את הsha1 שכרגע מוצבע ע"י הhead הנוכחי,וגם הקומיט הנוכחי יהיה כמוהו, ושהhead הנוכחי עכשיו יצביע על הbranch שעכשיו יצרתי, להוסיף את הbranch לוגית ברפוזטורי
+    private void CreatBranch() {
         String newBranchName;
         boolean isValid=false;
         Scanner sc = new Scanner(System.in);
@@ -293,16 +254,7 @@ public class Runner {
         }
 
     }
-    /*void DeleteBranch()
-    {
-        Scanner sc = new Scanner(System.in);
 
-        out.println("Please enter the name of the branch you would like to delete");
-        String branchName = sc.nextLine();
-
-        manager.deleteBranchFromRepository(branchName);
-
-    }*/
 
     void DeleteBranch()
     {

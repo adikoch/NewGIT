@@ -385,17 +385,7 @@ public class GitManager {
     }
 
 
-    /*public void CreateNewBranch(String newBranchName) throws FileAlreadyExistsException {
-        for (Branch X : GITRepository.getBranches()) {
-            if (X.getBranchName() == newBranchName) {
-                throw new FileAlreadyExistsException("");
-            } else {
-                Branch newB = new Branch(newBranchName);
-                GITRepository.getBranches().add(newB);
-                newB.setPointedCommit(GITRepository.getHeadBranch().getPointedCommit());
-            }
-        }
-    }*/
+
 
     private static void createFileInMagit(Object obj, Path path) throws Exception {
         Class objClass = obj.getClass();
