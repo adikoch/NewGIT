@@ -13,7 +13,6 @@ public class Repository {
     private Map<String,Path> SHA1Map = new HashMap<>();
     private LinkedList<Commit> commitList = new LinkedList<>();
 
-
     LinkedList<Commit> getCommitList() {
         return commitList;
     }
@@ -46,7 +45,7 @@ public class Repository {
         path = newPath;
     }
 
-    Branch setBranchByName(String name)
+    Branch setBranchByName(String name)// אמורים לקרוא לו גט ולא סט
     {
         Branch newBranch = null;
         for(Branch b:branches) {
@@ -56,6 +55,8 @@ public class Repository {
         return newBranch;
 
     }
+
+
 
     void getRepositorysBranchesObjecets()
     {

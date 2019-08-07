@@ -22,26 +22,6 @@ public class Runner {
     //private LinkedList<Commit> CommitsList= new LinkedList<>();
 
 
- /*   public void run() {
-        boolean isValid=true;
-        MainMenu menu = new MainMenu();
-        String userInput = "1";
-        while (userInput !="13" || !isValid) {
-            if(isValid) menu.show();
-            try{
-            userInput = scanInput.nextLine();
-            isValid= !isOutOfRange(1,13,userInput);
-            }
-            catch(Exception e) {isValid=false;}
-            if(isValid)// קלט תקין
-            {
-                sendToOption(userInput);
-            }
-            else System.out.println("number out of bound! Please enter a valid input");
-        }
-    }*/
-
-
     public void run() {
         boolean isNumber=true, isValid=true;
         int result=0;
@@ -61,7 +41,7 @@ public class Runner {
 
             if(isValid)
                 sendToOption(result);
-            else out.println("number out of bound! Please enter a valid input");
+            else out.println("Please enter a valid input!");
         }
     }
 
@@ -98,7 +78,7 @@ public class Runner {
                 break;
 
             case (8):
-                CreatBranch();
+                CreatBranch();// יווצא קובץ חדש בתיקייה branches, שבתוכו יש את הsha1 שכרגע מוצבע ע"י הhead הנוכחי,וגם הקומיט הנוכחי יהיה כמוהו, ושהhead הנוכחי עכשיו יצביע על הbranch שעכשיו יצרתי, להוסיף את הbranch לוגית ברפוזטורי
                 break;
 
             case (9):
@@ -183,24 +163,28 @@ public class Runner {
 
     }
 
-    private void CreatBranch() {//
+
+
+    private void CreatBranch() {
+        String newBranchName;
         boolean isValid=false;
-        if (manager.getGITRepository() != null) {
-            Scanner sc = new Scanner(System.in);
-            while(!isValid){
-                System.out.println("Enter the full name for the new branch: ");
-                String newBranchName = sc.nextLine();
-                try {
-                    manager.CreateNewBranch(newBranchName);
-                    isValid=true;
-                } catch (FileAlreadyExistsException ex) {
-                    System.out.println("The branch name already exist, please try again");
+        Scanner sc = new Scanner(System.in);
+        out.println("Please enter the name of the new branch");
+        newBranchName=sc.nextLine();//getting the name
+
+        while(!isValid){
+            for(Branch b: manager.getGITRepository().getBranches())                //checking if exist already
+            {
+                if(b.getBranchName().equals(newBranchName))
+                {
                     isValid=false;
+                    out.println("Branch name already exist, please enter a different name");
+                    newBranchName=sc.nextLine();//getting the name
                 }
+                else isValid=true;
             }
-    }   else {
-        out.println("There is no repository defined!");
-    }
+        }//valid:
+        manager.CreatBranch(newBranchName);
     }
 
     private void createEmptyRepository() {
@@ -270,17 +254,22 @@ public class Runner {
         }
 
     }
+
+
     void DeleteBranch()
     {
-        Scanner sc = new Scanner(System.in);
+        out.println("Please enter the name of the branch to delete");
+        Scanner sc= new Scanner(System.in);
+        String branchName= sc.nextLine();
 
-        out.println("Please enter the name of the branch you would like to delete");
-        String branchName = sc.nextLine();
-
-        manager.deleteBranchFromRepository(branchName);
+        try{
+        manager.DeleteBranch(branchName);}
+        catch(Exception e)
+        {
+            out.println("Erasing the head branch is not a valid action, no changes occurred");
+        }
 
     }
-
 
     private static boolean isOutOfRange(int min, int max, int val)
     {
