@@ -183,7 +183,8 @@ public class Runner {
 
     }
 
-    private void CreatBranch() {//
+    /*private void CreatBranch() {// יווצא קובץ חדש בתיקייה branches, שבתוכו יש את הsha1 שכרגע מוצבע ע"י הhead הנוכחי,וגם הקומיט הנוכחי יהיה כמוהו, ושהhead הנוכחי עכשיו יצביע על הbranch שעכשיו יצרתי, להוסיף את הbranch לוגית ברפוזטורי
+
         boolean isValid=false;
         if (manager.getGITRepository() != null) {
             Scanner sc = new Scanner(System.in);
@@ -201,6 +202,28 @@ public class Runner {
     }   else {
         out.println("There is no repository defined!");
     }
+    }*/
+
+    private void CreatBranch() {// יווצא קובץ חדש בתיקייה branches, שבתוכו יש את הsha1 שכרגע מוצבע ע"י הhead הנוכחי,וגם הקומיט הנוכחי יהיה כמוהו, ושהhead הנוכחי עכשיו יצביע על הbranch שעכשיו יצרתי, להוסיף את הbranch לוגית ברפוזטורי
+        String newBranchName;
+        boolean isValid=false;
+        Scanner sc = new Scanner(System.in);
+        out.println("Please enter the name of the new branch");
+        newBranchName=sc.nextLine();//getting the name
+
+        while(!isValid){
+            for(Branch b: manager.getGITRepository().getBranches())                //checking if exist already
+            {
+                if(b.getBranchName().equals(newBranchName))
+                {
+                    isValid=false;
+                    out.println("Branch name already exist, please enter a different name");
+                    newBranchName=sc.nextLine();//getting the name
+                }
+                else isValid=true;
+            }
+        }//valid:
+        manager.CreatBranch(newBranchName);
     }
 
     private void createEmptyRepository() {
@@ -270,7 +293,7 @@ public class Runner {
         }
 
     }
-    void DeleteBranch()
+    /*void DeleteBranch()
     {
         Scanner sc = new Scanner(System.in);
 
@@ -279,8 +302,22 @@ public class Runner {
 
         manager.deleteBranchFromRepository(branchName);
 
-    }
+    }*/
 
+    void DeleteBranch()
+    {
+        out.println("Please enter the name of the branch to delete");
+        Scanner sc= new Scanner(System.in);
+        String branchName= sc.nextLine();
+
+        try{
+        manager.DeleteBranch(branchName);}
+        catch(Exception e)
+        {
+            out.println("Erasing the head branch is not a valid action, no changes occurred");
+        }
+
+    }
 
     private static boolean isOutOfRange(int min, int max, int val)
     {

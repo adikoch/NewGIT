@@ -275,11 +275,29 @@ public class GitManager {
         return currentFolder;
     }
 
-    public void CreatBranch() {
+    public void CreatBranch(String newBranchName) {
+        Path pathOfNewFile= Paths.get(getGITRepository().getRepositoryPath().toString()+"\\"+".magit\\branches\\");
+                //Path workingPath = Paths.get(repPath + repName + "\\");
+        String nameOfBranch=readTextFile(getGITRepository().getRepositoryPath().toString()+"\\"+".magit\\branches\\Head");//name of main branch
+        String sha1OfCurrCommit=readTextFile(getGITRepository().getRepositoryPath().toString()+"\\"+".magit\\branches\\"+nameOfBranch);
+        createFile(newBranchName,sha1OfCurrCommit,pathOfNewFile);// a file created in branches
+
+        Branch newBranch= new Branch(newBranchName,GITRepository.getHeadBranch().getPointedCommit().getSHA());
+        newBranch.setPointedCommit(GITRepository.getHeadBranch().getPointedCommit());//creating and initialising
+
+        GITRepository.getBranches().add(newBranch);//adding to logic//not good
 
     }
 
-    public void DeleteBranch() {
+    public void DeleteBranch(String FileName) throws Exception {
+        if(FileName.equals(readTextFile(GITRepository.getRepositoryPath().toString()+"\\"+".magit\\branches\\Head")))
+            throw new Exception();
+        File file= new File(GITRepository.getRepositoryPath().toString()+"\\"+".magit\\branches\\"+FileName);
+        file.delete();//// erasing it physically
+        System.out.println("Branch deleted successfully");
+
+        Branch branch=GITRepository.setBranchByName(FileName);
+        GITRepository.getBranches().remove(branch);// erasing it logically
 
     }
 
@@ -367,7 +385,7 @@ public class GitManager {
     }
 
 
-    public void CreateNewBranch(String newBranchName) throws FileAlreadyExistsException {
+    /*public void CreateNewBranch(String newBranchName) throws FileAlreadyExistsException {
         for (Branch X : GITRepository.getBranches()) {
             if (X.getBranchName() == newBranchName) {
                 throw new FileAlreadyExistsException("");
@@ -377,7 +395,7 @@ public class GitManager {
                 newB.setPointedCommit(GITRepository.getHeadBranch().getPointedCommit());
             }
         }
-    }
+    }*/
 
     private static void createFileInMagit(Object obj, Path path) throws Exception {
         Class objClass = obj.getClass();
@@ -460,7 +478,7 @@ public class GitManager {
         out.close();
     }
 
-    public static void createFile(String fileName, String fileContent, Path path) {
+    public static void createFile(String fileName, String fileContent, Path path) { // gets a name for new file,what to right inside, where to put it
         Writer out = null;
 
         File file = new File(path + "\\" + fileName);
@@ -490,11 +508,11 @@ public class GitManager {
         }
     }
 
-    public static String readTextFile(String fileName) {
+    public static String readTextFile(String filePath) {
         String returnValue = "";
         String line;
         try {
-            FileReader file = new FileReader(fileName);
+            FileReader file = new FileReader(filePath);
             BufferedReader reader = new BufferedReader(file);
             try {
                 while ((line = reader.readLine()) != null) {
