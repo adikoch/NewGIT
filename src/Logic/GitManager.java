@@ -24,7 +24,7 @@ public class GitManager {
     //    private class diffLogClass {
     private LinkedList<Path> updatedFiles = new LinkedList<Path>();
     private LinkedList<Path> createdFiles = new LinkedList<Path>();
-    private LinkedList<Path> deletedFile = new LinkedList<Path>();
+    private LinkedList<Path> deletedFiles = new LinkedList<Path>();
     // }
 
 
@@ -37,7 +37,7 @@ public class GitManager {
     }
 
     public LinkedList<Path> getDeletedFile() {
-        return deletedFile;
+        return deletedFiles;
     }
 
     public Repository getGITRepository() {
@@ -155,7 +155,7 @@ public class GitManager {
                             //file was deleted from old
                             oldd++;
                             //add to list
-                            this.deletedFile.add(Paths.get(path.toString() + "\\" + oldComponents.get(oldd).getComponentName()));
+                            this.deletedFiles.add(Paths.get(path.toString() + "\\" + oldComponents.get(oldd).getComponentName()));
                         } else {
                             //new file was added
                             neww++;
@@ -173,8 +173,14 @@ public class GitManager {
             neww++;
         }
         while (oldd < oldComponents.size() ) {
-            this.deletedFile.add(Paths.get(path.toString() + "\\" + oldComponents.get(oldd).getComponentSHA1()));
+            if(oldComponents.get(oldd).getComponentType().equals(FolderType.Folder))
+            {
+                Folder f = new Folder( newComponents.get(neww));
+                createShaAndZipForNewCommit(f, null, isCreateZip, Paths.get(path.toString() + "\\" + oldComponents.get(oldd).getComponentName()));
+            }
+            this.deletedFiles.add(Paths.get(path.toString() + "\\" + newComponents.get(neww).getComponentName()));
             oldd++;
+
         }
         while ( neww < newComponents.size()) {
             if(newComponents.get(neww).getComponentType().equals(FolderType.Blob))
@@ -357,6 +363,7 @@ public class GitManager {
                 this.GITRepository.getRepositorysBranchesObjecets();
                 //GITRepository.getRepositoryName() = ךהחליף שם של רפוסיטורי
                 //לא יצרנו קומיט שההד יצביע עליו כי אין צורך
+                GITRepository.getHeadBranch().setPointedCommitSHA1(newCommit.getSHA());
             } else throw new ExceptionInInitializerError();//exeption forG not being magit
 
         } else throw new IllegalArgumentException();//exception for not existing
@@ -522,6 +529,37 @@ public class GitManager {
         File f = Paths.get(objectsPath + ShA1 + ".zip").toFile();
         return f;
 
+    }
+
+    @Override
+    public String toString() {
+        String separator = System.lineSeparator() + "***" + System.lineSeparator();
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("All the updated files:");
+        sb.append(separator);
+        for (Path updatedFilePath: updatedFiles){
+            sb.append(updatedFilePath.toString());
+            sb.append(System.lineSeparator());
+        }
+
+        sb.append("All the created files:");
+        sb.append(separator);
+        for (Path addedFilePath: createdFiles) {
+            sb.append(addedFilePath.toString());
+            sb.append(System.lineSeparator());
+        }
+
+        sb.append("All the deleted files:");
+        sb.append(separator);
+        for (Path deletedFilePath: deletedFiles){
+            sb.append(deletedFilePath.toString());
+            sb.append(System.lineSeparator());
+        }
+
+        sb.append(System.lineSeparator());
+
+        return sb.toString();
     }
 
 }
