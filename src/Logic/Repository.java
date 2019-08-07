@@ -11,10 +11,11 @@ public class Repository {
    private HashSet<Branch> branches;
    private Branch head;
     private Map<String,Path> SHA1Map = new HashMap<>();
-    private LinkedList<Commit> commitList = new LinkedList<>();
+    private Map<String,Commit> commitMap =new HashMap<>();
 
-    LinkedList<Commit> getCommitList() {
-        return commitList;
+    Map<String,Commit> getCommitList() {
+        //return commitList;
+        return commitMap;
     }
 
     private String repositoryName;
@@ -30,7 +31,7 @@ public class Repository {
         branches.add(headBranch);
         head = headBranch;
         repositoryName = "EmptyRepository";
-        commitList = new LinkedList<>();
+        commitMap = new HashMap<>();
     }
     public  String getRepositoryName(){ return repositoryName; }
     public  Path getRepositoryPath(){ return path; }
