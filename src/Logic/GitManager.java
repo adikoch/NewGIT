@@ -94,13 +94,13 @@ public class GitManager {
                 GITRepository.getHeadBranch().setPointedCommit(c); //creation
                 GITRepository.getHeadBranch().getPointedCommit().setSHA1PreveiousCommit(prevCommitSHA1); //setting old commits sha1
                 GITRepository.getHeadBranch().getPointedCommit().setOrigCommit(newFolder); //setting old commit
-                GITRepository.getCommitList().put(GITRepository.getHeadBranch().getPointedCommit().getSHA(),GITRepository.getHeadBranch().getPointedCommit()); //adding to commits list of the current reposetory
                 GITRepository.getHeadBranch().getPointedCommit().setCommitFileContentToSHA(); //
+                GITRepository.getCommitList().put(GITRepository.getHeadBranch().getPointedCommit().getSHA(),GITRepository.getHeadBranch().getPointedCommit()); //adding to commits list of the current reposetory
                 createFile(GITRepository.getHeadBranch().getBranchName(), GITRepository.getHeadBranch().getPointedCommit().getSHA(), BranchesPath);
                 GITRepository.getHeadBranch().setPointedCommitSHA1(c.getSHA());
                 createZipFile(ObjectPath,generateSHA1FromString(newFolder.getFolderContentString()),newFolder.getFolderContentString());
-                    try{
-                createFileInMagit(GITRepository.getHeadBranch().getPointedCommit(),GITRepository.getRepositoryPath());}
+                try{
+                    createFileInMagit(GITRepository.getHeadBranch().getPointedCommit(),GITRepository.getRepositoryPath());}
                 catch (Exception e) {throw new Exception();}
 
                 try {
@@ -332,9 +332,6 @@ public class GitManager {
 
     }
 
-    public static void ShowHistoryOfActiveBranch() {
-
-    }
 
     public void createEmptyRepositoryFolders(String repPath, String repName)
             throws ExceptionInInitializerError, IllegalArgumentException {
@@ -542,11 +539,12 @@ public class GitManager {
     public void ShowHistoryActiveBranchRec(String sha1OfMainBranch)
     {
         Commit com= GITRepository.getCommitList().get(sha1OfMainBranch);
-        System.out.println(com.getSHAContent());// printing the one i got
-        if(sha1OfMainBranch.equals(new Commit().getSHA()))// if first commit ever
+        if(com==null)// if first commit ever
         {
             return;
         }
+        System.out.println(com.getSHAContent());// printing the one i got
+        System.out.println(System.lineSeparator());
         ShowHistoryActiveBranchRec(com.getSHA1PreveiousCommit());
 
     }

@@ -8,7 +8,7 @@ public class Branch {
 
    private String branchName;
     private Commit pointedCommit;
-    private  String pointedCommitSHA1;
+    private  String pointedCommitSHA1="";
 
     void setPointedCommitSHA1(String pointedCommit) {
         pointedCommitSHA1 = pointedCommit;

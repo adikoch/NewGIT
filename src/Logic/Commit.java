@@ -12,7 +12,7 @@ import java.util.Date;
 import java.util.LinkedList;
 
 public class Commit {
-    private String SHA1;
+    private String SHA1="";
 
 
 
