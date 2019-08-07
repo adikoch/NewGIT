@@ -13,12 +13,19 @@ import java.util.LinkedList;
 
 public class Commit {
     private String SHA1;
+
+
+
+
     private Folder rootFolder;
     private String rootFolderPathName;// main library repository
     private String SHA1PreveiousCommit;
     private String SHA1PrevPrevCommit;
     private String description;
     private String creationDate;
+
+
+//אולי צריך שיהיה לנו פה גם את הקומיט הקודם עצמו ולא רק את השא1 שלו
     private String changer;
     private String SHAContent;
 
@@ -51,6 +58,11 @@ public class Commit {
 
 
     // getters, setters
+
+    public String getSHAContent()
+    {
+        return SHAContent;
+    }
 
     public Folder getRootFolder() {
         return rootFolder;
@@ -133,12 +145,22 @@ public class Commit {
         return SHA1;
         //return  GitManager.generateSHA1FromString(getCommitFileContent());
     }
-    public String getSHAContent(){
-        return SHAContent;
+    //public String getSHAContent(){
+      //  return SHAContent;
         //return  GitManager.generateSHA1FromString(getCommitFileContent());
-    }
+    //}
 
+    /*public static void ShowHistoryOfActiveBranchRec(Commit activeBranchCommit)//????????????????????where
+    {
+        if(activeBranchCommit.getSHA().equals(new Commit().getSHA())) //first Commit ever
+        {
+            activeBranchCommit.getSHAContent();
+        }
+        //ShowHistoryOfActiveBranchRec(activeBranchCommit.getPrevCommit());
+        //לקחת את הקומיט שהוא אבא שלי ולשלוח עליו ברקורסיה
+        //לי יש את הsha1 שלו אז יכולה ללכת לmap של הקומיטים ולמצוא אותו לפי הsha1
 
+    }*/
 
 
 

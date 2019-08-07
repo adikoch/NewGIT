@@ -90,7 +90,7 @@ public class Runner {
                 break;
 
             case (11):
-                //ShowHistoryOfActiveBranch();
+                ShowHistoryOfActiveBranch();
                 break;
 
             case (12):
@@ -104,6 +104,11 @@ public class Runner {
         }
 
 
+    }
+
+    private void ShowHistoryOfActiveBranch() {
+        //מהבראנצ שיש כרגע בתוך ההד, רוצה להציג את כל האחורה שלו כלומר רקורסיבית כל פעם ללכת לאבא ולהדפיס את הקומיט עד שיש נאל
+        manager.ShowHistoryActiveBranch();
     }
 
     private void UpdateUsername() {
@@ -209,12 +214,6 @@ public class Runner {
         }
     }
 
-    /*
-                }   else throw new IllegalArgumentException(); // the wanted name already exist
-        }
-            else throw new ExceptionInInitializerError() ; // the wanted path doesnt exist
-     */
-
 
 
 
@@ -237,24 +236,12 @@ public class Runner {
 
     }
 
-    void ShowAllBranches() {
-        if (manager.getGITRepository() != null) {
-            HashSet<Branch> branches = manager.getGITRepository().getBranches();
-            for (Branch b : branches) {
-                if (manager.getGITRepository().getHeadBranch().equals(b)) {
-                    System.out.println("\u2764");
-                }
-                out.println("Branch's Name:" + b.getBranchName());
-                out.println("Branch's pointed commit SHA1:" + b.getPointedCommit().getSHA());
-                out.println("Branch's pointed commit Description:" + b.getPointedCommit().getDescription());
-                out.println(lineSeparator());
-            }
-        } else {
-            out.println("The is no repository defined!");
-        }
 
+    void ShowAllBranches()
+    {
+        String allBranches=manager.getAllBranches();
+        out.println(allBranches);
     }
-
 
     void DeleteBranch()
     {
@@ -278,10 +265,6 @@ public class Runner {
         return true;
     }
 
-    public boolean isNotNumber()
-    {
-        return true;
-    }
 
 
 }

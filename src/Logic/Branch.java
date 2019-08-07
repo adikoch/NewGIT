@@ -39,6 +39,8 @@ public class Branch {
         pointedCommit=newC;
     }
 
+
+
     //  tracking true
 //    String branchName;
 //    Integer pointedCommit;
