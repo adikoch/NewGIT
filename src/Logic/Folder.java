@@ -133,7 +133,7 @@ public class Folder implements FileObject{
         StringBuilder sb = new StringBuilder();
 
         for(Component c: components) {
-            sb.append(c.toString());
+            sb.append(c.getComponentsString());
             sb.append(System.lineSeparator());
         }
 

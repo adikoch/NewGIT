@@ -98,7 +98,7 @@ public class GitManager {
                 GITRepository.getHeadBranch().getPointedCommit().setCommitFileContentToSHA(); //
                 createFile(GITRepository.getHeadBranch().getBranchName(), GITRepository.getHeadBranch().getPointedCommit().getSHA(), BranchesPath);
                 GITRepository.getHeadBranch().setPointedCommitSHA1(c.getSHA());
-
+                createZipFile(ObjectPath,generateSHA1FromString(newFolder.getFolderContentString()),newFolder.getFolderContentString());
                     try{
                 createFileInMagit(GITRepository.getHeadBranch().getPointedCommit(),GITRepository.getRepositoryPath());}
                 catch (Exception e) {throw new Exception();}
@@ -108,96 +108,110 @@ public class GitManager {
 
     private void createShaAndZipForNewCommit(Folder newFolder, Folder oldFolder, Boolean isCreateZip, Path path) throws IOException {
         ArrayList<Folder.Component> newComponents = newFolder.getComponents();
-        ArrayList<Folder.Component> oldComponents = oldFolder.getComponents();
-        Path objectPath  = Paths.get(path.toString() + "\\.magit\\Objects");
+        ArrayList<Folder.Component> oldComponents;
+        Path objectPath = Paths.get(GITRepository.getRepositoryPath().toString() + "\\.magit\\Objects");
         int oldd = 0;
-        int neww = 0;// indexes of the component in the lists
+        int neww = 0;
+        if ((oldFolder != null)) {
+            oldComponents = oldFolder.getComponents();
 
-        // for (int i=0 , j=0; i<= newComponents.size() && j<=oldComponents.size(); i++) {
-        while (oldd < oldComponents.size() && neww < newComponents.size()) { // while two folders are not empty
-            if (!newComponents.get(neww).getComponentName().equals(".magit")) { //for each component at new
-                if (!oldComponents.get(oldd).getComponentName().equals(".magit")) { //for each component at old
+// indexes of the component in the lists
+            // for (int i=0 , j=0; i<= newComponents.size() && j<=oldComponents.size(); i++) {
+            while (oldd < oldComponents.size() && neww < newComponents.size()) { // while two folders are not empty
+                if (oldComponents.get(oldd).getComponentName().equals(newComponents.get(neww).getComponentName())) { // if names are the same
+                    if (oldComponents.get(oldd).getComponentSHA1().equals(newComponents.get(neww).getComponentSHA1())) { //if sha1 is the same
+                        //point old object
+                        newComponents.set(neww, oldComponents.get(oldd)); // if nothing changed, point at the original tree
+                   neww++;
+                   oldd++;
+                    } else if (oldComponents.get(oldd).getComponentType().equals(newComponents.get(neww).getComponentType())) { //different sha1, updated file
+                        if (oldComponents.get(oldd).getComponentType().equals(FolderType.Folder)) {
+                            Folder newf = (Folder) newComponents.get(neww).getDirectObject();
+                            Folder oldf = (Folder) oldComponents.get(oldd).getDirectObject();
 
-                    if (oldComponents.get(oldd).getComponentName().equals(newComponents.get(neww).getComponentName())) { // if names are the same
-                        if (oldComponents.get(oldd).getComponentSHA1().equals(newComponents.get(neww).getComponentSHA1())) { //if sha1 is the same
-                            //point old object
-                            newComponents.set(neww, oldComponents.get(oldd)); // if nothing changed, point at the original tree
-                            return;
-                        } else if (oldComponents.get(oldd).getComponentType().equals(newComponents.get(neww).getComponentType())) { //different sha1, updated file
-                            if (oldComponents.get(oldd).getComponentType().equals(FolderType.Folder)) {
-                                Folder newF = new Folder(newComponents.get(neww));
-                                Folder oldF = new Folder(oldComponents.get(oldd));
-                                createShaAndZipForNewCommit(newF, oldF, isCreateZip, Paths.get(path.toString() + "\\" + oldComponents.get(oldd).getComponentName()));
-                                createZipFile(objectPath,generateSHA1FromString(newF.getFolderContentString()),newF.getFolderContentString());
-
-                            } else {
-                                //both blob - updated
-                                Blob b = (Blob)newComponents.get(neww).getDirectObject();
-                                createZipFile(objectPath,newComponents.get(neww).getComponentSHA1(),b.getContent());
-                                //add updated file zip
-                                //add to path
-                                this.updatedFiles.add(Paths.get(path.toString() + "\\" + newComponents.get(neww).getComponentName()));
-
-                            }
+                            // Folder newF = new Folder(newComponents.get(neww));
+                            //Folder oldF = new Folder(oldComponents.get(oldd));
+                            createShaAndZipForNewCommit(newf, oldf, isCreateZip, Paths.get(path.toString() + "\\" + oldComponents.get(oldd).getComponentName()));
+                            createZipFile(objectPath, generateSHA1FromString(newf.getFolderContentString()), newf.getFolderContentString());
+                            neww++;
+                            oldd++;
                         } else {
-                            //one blob one folder - one of them was created with the same name(diff type now)
-                            //add new file creeate zip
+                            //both blob - updated
+                            Blob b = (Blob) newComponents.get(neww).getDirectObject();
+                            createZipFile(objectPath, newComponents.get(neww).getComponentSHA1(), b.getContent());
+                            //add updated file zip
+                            //add to path
+                            this.updatedFiles.add(Paths.get(path.toString() + "\\" + newComponents.get(neww).getComponentName()));
+                            neww++;
+                            oldd++;
+                        }
+                    } else {
+                        //one blob one folder - one of them was created with the same name(diff type now)
+                        //add new file creeate zip
 
 //                            createZipFile(path,newComponents.get(neww).getComponentSHA1(),newComponents.get(neww).getDirectObject().);
 //
 //                            //add to list
 //                            this.createdFiles.add(Paths.get(path.toString() + "\\" + newComponents.get(neww).getComponentName()));
 //                            neww++;
-                        }
-                    } else {
-                        int result = newComponents.get(neww).getComponentName().compareTo(oldComponents.get(oldd).getComponentName());
-                        if (result > 0) {
-                            //file was deleted from old
-                            oldd++;
-                            //add to list
-                            this.deletedFiles.add(Paths.get(path.toString() + "\\" + oldComponents.get(oldd).getComponentName()));
-                        } else {
-                            //new file was added
-                            neww++;
-                            //add new zip
-                            //createZipFile(path,newComponents.get(neww).getComponentSHA1(),newComponents.get(neww).);
+                    }
+                } else {
+                    int result = newComponents.get(neww).getComponentName().compareTo(oldComponents.get(oldd).getComponentName());
+                    if (result > 0) {
+                        //file was deleted from old
+                        //add to list
+                        this.deletedFiles.add(Paths.get(path.toString() + "\\" + oldComponents.get(oldd).getComponentName()));
+                        oldd++;
 
-                            //add to list
-                            this.createdFiles.add(Paths.get(path.toString() + "\\" + newComponents.get(neww).getComponentName()));
+                    } else {
+                        //new file was added
+                        //add new zip
+                        //createZipFile(path,newComponents.get(neww).getComponentSHA1(),newComponents.get(neww).);
+
+                        //add to list
+                        if (newComponents.get(neww).getComponentType().equals(FolderType.Blob)) {
+                            Blob b = (Blob) newComponents.get(neww).getDirectObject();
+                            createZipFile(objectPath, newComponents.get(neww).getComponentSHA1(), b.getContent());
+                        } else {
+                            Folder f = (Folder) newComponents.get(neww).getDirectObject();
+
+                            //Folder f = new Folder(newComponents.get(neww));
+                            createShaAndZipForNewCommit(f, null, isCreateZip, Paths.get(path.toString() + "\\" + newComponents.get(neww).getComponentName()));
+                            createZipFile(objectPath, generateSHA1FromString(f.getFolderContentString()), f.getFolderContentString());
+
                         }
+                        this.createdFiles.add(Paths.get(path.toString() + "\\" + newComponents.get(neww).getComponentName()));
+                        neww++;
                     }
                 }
+            }
 
+            while (oldd < oldComponents.size()) {
+                if (oldComponents.get(oldd).getComponentType().equals(FolderType.Folder)) {
+                    Folder f = (Folder) oldComponents.get(oldd).getDirectObject();
+
+                    //Folder f = new Folder(newComponents.get(neww));
+                    createShaAndZipForNewCommit(f, null, isCreateZip, Paths.get(path.toString() + "\\" + oldComponents.get(oldd).getComponentName()));
+                }
+                this.deletedFiles.add(Paths.get(path.toString() + "\\" + newComponents.get(neww).getComponentName()));
                 oldd++;
-            }
-            neww++;
-        }
-        while (oldd < oldComponents.size() ) {
-            if(oldComponents.get(oldd).getComponentType().equals(FolderType.Folder))
-            {
-                Folder f = new Folder( newComponents.get(neww));
-                createShaAndZipForNewCommit(f, null, isCreateZip, Paths.get(path.toString() + "\\" + oldComponents.get(oldd).getComponentName()));
-            }
-            this.deletedFiles.add(Paths.get(path.toString() + "\\" + newComponents.get(neww).getComponentName()));
-            oldd++;
 
-        }
-        while ( neww < newComponents.size()) {
-            if(newComponents.get(neww).getComponentType().equals(FolderType.Blob))
-            {
-                Blob b = (Blob)newComponents.get(neww).getDirectObject();
-                createZipFile(objectPath,newComponents.get(neww).getComponentSHA1(),b.getContent());
             }
-            else
-            {
-                Folder f = new Folder( newComponents.get(neww));
-                createShaAndZipForNewCommit(f, null, isCreateZip, Paths.get(path.toString() + "\\" + oldComponents.get(oldd).getComponentName()));
-                createZipFile(objectPath,generateSHA1FromString(f.getFolderContentString()),f.getFolderContentString());
+        }
+        while (neww < newComponents.size()) {
+            if (newComponents.get(neww).getComponentType().equals(FolderType.Blob)) {
+                Blob b = (Blob) newComponents.get(neww).getDirectObject();
+                createZipFile(objectPath, newComponents.get(neww).getComponentSHA1(), b.getContent());
+            } else {
+                Folder f = (Folder) newComponents.get(neww).getDirectObject();
+
+                //Folder f = new Folder(newComponents.get(neww).getDirectObject().);
+                createShaAndZipForNewCommit(f, null, isCreateZip, Paths.get(path.toString() + "\\" + newComponents.get(neww)));
+                createZipFile(objectPath, generateSHA1FromString(f.getFolderContentString()), f.getFolderContentString());
 
             }
             this.createdFiles.add(Paths.get(path.toString() + "\\" + newComponents.get(neww).getComponentName()));
             neww++;
-
 
 
         }

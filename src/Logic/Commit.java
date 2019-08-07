@@ -13,10 +13,6 @@ import java.util.LinkedList;
 
 public class Commit {
     private String SHA1;
-
-
-
-
     private Folder rootFolder;
     private String rootFolderPathName;// main library repository
     private String SHA1PreveiousCommit;
@@ -56,7 +52,9 @@ public class Commit {
 
     // getters, setters
 
-
+    public Folder getRootFolder() {
+        return rootFolder;
+    }
     public void setRootFolder(Folder rootFolder) {
         this.rootFolder = rootFolder;
     }
