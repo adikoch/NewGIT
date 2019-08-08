@@ -335,10 +335,12 @@ public class GitManager {
                 File f = Paths.get(newRepPath.toString() + "\\.magit\\branches\\Head").toFile();
                 String content = readTextFile(newRepPath + "\\.magit\\branches\\" + f.getName());
                 String name = readTextFile(newRepPath + "\\.magit\\branches\\" + content);
+                this.GITRepository = new Repository(newRepPath);
 
                 this.GITRepository.getRepositorysBranchesObjecets();
-                this.GITRepository = new Repository(newRepPath, GITRepository.getBranchByName(name));
                 GITRepository.Switch(newRepPath);
+                GITRepository.setHeadBranch(GITRepository.getBranchByName("content"));
+
 
                 getCommitForBranches(newRepPath);
 //                Path commitPath = Paths.get(newRepPath + "\\.magit\\objects\\" + name + ".zip");

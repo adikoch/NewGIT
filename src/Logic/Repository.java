@@ -15,6 +15,12 @@ public class Repository {
     //String repositoryLocation;
     //String remoteReferenceName;
     //String referenceNameLocation;
+    Repository(Path workingPath) {
+        path = workingPath;
+        branches = new HashSet<>();
+        repositoryName = "EmptyRepository";
+        commitMap = new HashMap<>();
+    }
 
 
     Repository(Path workingPath, Branch headBranch) {
@@ -68,15 +74,17 @@ public class Repository {
     }
 
 
-    void getRepositorysBranchesObjecets() {
+   void getRepositorysBranchesObjecets() {
         Path BranchesPath = Paths.get(path.toString() + "\\.magit\\Branches");
         File[] allBranches = BranchesPath.toFile().listFiles();
         String fileContent;
 
         for (File f : allBranches) {
             {
-                fileContent = GitManager.readTextFile(f.toString());
-                this.branches.add(new Branch(f.getName(), fileContent));
+                if(f.getName() != "Head") {
+                    fileContent = GitManager.readTextFile(f.toString());
+                    this.branches.add(new Branch(f.getName(), fileContent));
+                }
             }
         }
     }
