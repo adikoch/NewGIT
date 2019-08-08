@@ -1,7 +1,6 @@
 package Logic;
 
-import java.io.File;
-import java.io.Serializable;
+import java.io.*;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Date;
@@ -17,6 +16,8 @@ public class Folder implements FileObject{
     //Enum folderType;
     //List<component> items;//sha1
     //Boolean isRoot;
+
+
 
     private ArrayList<Component> components;
     //private String SHA1;
@@ -48,7 +49,7 @@ public class Folder implements FileObject{
         }
 
 
-        Component(String name, String sha1, FolderType type, String lastUpdater, Long lastUpdateDate){
+        Component(String name, String sha1, FolderType type, String lastUpdater, String lastUpdateDate){
 
             this.type= type;
             this.name=name;
@@ -73,7 +74,7 @@ public class Folder implements FileObject{
 //
 //        }
 
-        String getComponentsString() {
+        String getComponentsStringFromComponent() {
             StringBuilder content = new StringBuilder();
             content.append(name);
             content.append(",");
@@ -87,12 +88,34 @@ public class Folder implements FileObject{
             return content.toString();
 
         }
+
+       static Component getComponentFromString  (String s) throws IOException
+        {
+            String[] st =  s.split(",");
+            Component c = new Component(st[0],st[1],getTypeFromString(st[2]),st[3], st[4]);
+            return c;
+        }
+
+    }
+   static FolderType getTypeFromString(String s)
+    {
+        if(Folder.class.toString().equals(s))
+        {
+            return FolderType.Folder;
+        }
+        else
+        {
+            return FolderType.Blob;
+        }
     }
 
+    public void setComponents(ArrayList<Component> components) {
+        this.components = components;
+    }
     String stringComponentsToString() {
         StringBuilder content = new StringBuilder();
         for (Component a : components) {
-            content.append(a.getComponentsString());
+            content.append(a.getComponentsStringFromComponent());
             content.append(System.lineSeparator());
         }
         return content.toString();
@@ -128,12 +151,23 @@ public class Folder implements FileObject{
         return this.components;
     }
 
+    ArrayList<Component> setComponentsFromString(String compomemtString) throws IOException {
+        BufferedReader br = new BufferedReader(new StringReader(compomemtString));
+        ArrayList<Component> st = new ArrayList<>();
+        String a;
+        int i = 0;
+        while ((a = br.readLine()) != null) {
+            st.add(Component.getComponentFromString(a));
+            i++;
+        }
+        return st;
+    }
 
     String getFolderContentString() {
         StringBuilder sb = new StringBuilder();
 
         for(Component c: components) {
-            sb.append(c.getComponentsString());
+            sb.append(c.getComponentsStringFromComponent());
             sb.append(System.lineSeparator());
         }
 

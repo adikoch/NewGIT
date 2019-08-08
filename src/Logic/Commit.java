@@ -13,12 +13,12 @@ import java.util.LinkedList;
 
 public class Commit {
     private String SHA1="";
-
-
-
-
     private Folder rootFolder;
-    private String rootFolderPathName;// main library repository
+
+
+    private String rootFolderSHA1;
+
+    //private String rootFolderPathName;// main library repository
     private String SHA1PreveiousCommit;
     private String SHA1PrevPrevCommit;
     private String description;
@@ -34,7 +34,7 @@ public class Commit {
     public Commit()
     {
         description = "Start The Machine";
-        creationDate = GitManager.getDate();
+        creationDate = GitManager.getDate(null);
         changer = "Administrator";
     }
 
@@ -42,13 +42,13 @@ public class Commit {
     {
         description=usersDescription;
         //Date
-        creationDate = GitManager.getDate();
+        creationDate = GitManager.getDate(null);
         changer= userName;
     }
 
-    public Commit(ArrayList<String> args, Path path)
+    public Commit(ArrayList<String> args)
     {
-          rootFolderPathName = path.toString();// main library repository
+        rootFolderSHA1 = args.get(0);
           SHA1PreveiousCommit = args.get(1);
           SHA1PrevPrevCommit = args.get(2);
           description = args.get(3);
@@ -58,6 +58,14 @@ public class Commit {
 
 
     // getters, setters
+
+    public String getRootFolderSHA1() {
+        return rootFolderSHA1;
+    }
+
+    public void setRootFolderSHA1(String rootFolderSHA1) {
+        this.rootFolderSHA1 = rootFolderSHA1;
+    }
 
     public String getSHAContent()
     {
@@ -70,9 +78,9 @@ public class Commit {
     public void setRootFolder(Folder rootFolder) {
         this.rootFolder = rootFolder;
     }
-    public void setRootFolderPathName(String rootFolderPathName) {
-        this.rootFolderPathName = rootFolderPathName;
-    }
+//    public void setRootFolderPathName(String rootFolderPathName) {
+//        this.rootFolderPathName = rootFolderPathName;
+//    }
     public String getSHA1PreveiousCommit() {
         return SHA1PreveiousCommit;
     }
@@ -88,8 +96,8 @@ public class Commit {
 
     }
 
-    public String getRootFolderPathName(){
-        return rootFolderPathName;}
+//    public String getRootFolderPathName(){
+//        return rootFolderPathName;}
 
     public void setRootFolderPathName(){
 
@@ -98,8 +106,8 @@ public class Commit {
     public Folder getRootfolder(){
         return rootFolder;}
 
-    public void setRootfolder(String path){
-        rootFolderPathName = path;}
+//    public void setRootfolder(String path){
+//        rootFolderPathName = path;}
 
 
     public Folder getOrigCommit() {

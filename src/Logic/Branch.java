@@ -8,6 +8,9 @@ public class Branch {
 
    private String branchName;
     private Commit pointedCommit;
+
+
+
     private  String pointedCommitSHA1="";
 
     void setPointedCommitSHA1(String pointedCommit) {
@@ -22,6 +25,9 @@ public class Branch {
     {
         branchName = name;
         pointedCommitSHA1 = commitSHA1;
+    }
+    public String getPointedCommitSHA1() {
+        return pointedCommitSHA1;
     }
 
     public String getBranchName()
