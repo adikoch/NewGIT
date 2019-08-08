@@ -94,8 +94,8 @@ public class GitManager {
                 GITRepository.getHeadBranch().setPointedCommit(c); //creation
                 GITRepository.getHeadBranch().getPointedCommit().setSHA1PreveiousCommit(prevCommitSHA1); //setting old commits sha1
                 GITRepository.getHeadBranch().getPointedCommit().setOrigCommit(newFolder); //setting old commit
-                GITRepository.getCommitList().put(GITRepository.getHeadBranch().getPointedCommit().getSHA(),GITRepository.getHeadBranch().getPointedCommit()); //adding to commits list of the current reposetory
                 GITRepository.getHeadBranch().getPointedCommit().setCommitFileContentToSHA(); //
+                GITRepository.getCommitList().put(GITRepository.getHeadBranch().getPointedCommit().getSHA(),GITRepository.getHeadBranch().getPointedCommit()); //adding to commits list of the current reposetory
                 createFile(GITRepository.getHeadBranch().getBranchName(), GITRepository.getHeadBranch().getPointedCommit().getSHA(), BranchesPath);
                 GITRepository.getHeadBranch().setPointedCommitSHA1(c.getSHA());
                 createZipFile(ObjectPath,generateSHA1FromString(newFolder.getFolderContentString()),newFolder.getFolderContentString());
@@ -199,7 +199,7 @@ public class GitManager {
                     //Folder f = new Folder(newComponents.get(neww));
                     createShaAndZipForNewCommit(f, null, isCreateZip, Paths.get(path.toString() + "\\" + oldComponents.get(oldd).getComponentName()));
                 }
-                this.deletedFiles.add(Paths.get(path.toString() + "\\" + newComponents.get(neww).getComponentName()));
+                this.deletedFiles.add(Paths.get(path.toString() + "\\" + oldComponents.get(oldd).getComponentName()));
                 oldd++;
 
             }
