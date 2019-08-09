@@ -84,9 +84,10 @@ public class GitManager {
         //String creationDate = GitManager.getDate();
 
         Folder newFolder = GenerateFolderFromWC(GITRepository.getRepositoryPath());// ייצג את הספרייה הראשית
-        Folder oldFolder = GITRepository.getHeadBranch().getPointedCommit().getRootfolder();
+        Folder oldFolder = GITRepository.getHeadBranch().getPointedCommit().getRootfolder();//מהקומיט האחרון שעשינו
+
         if(!generateSHA1FromString(newFolder.getFolderContentString()).equals(generateSHA1FromString(oldFolder.getFolderContentString()))) {
-            createShaAndZipForNewCommit(newFolder, oldFolder, isCreateZip, GITRepository.getRepositoryPath());
+            createShaAndZipForNewCommit(newFolder,0 , oldFolder,0, isCreateZip, GITRepository.getRepositoryPath());
 
 
             if (isCreateZip) {
@@ -112,7 +113,168 @@ public class GitManager {
             }
         }
     }
+                                                     //a                               b
+    private void createShaAndZipForNewCommit(Folder newFolder, int newIndex, Folder oldFolder, int oldIndex, Boolean isCreateZip, Path path) throws IOException {
+        // turning the folders to lists i can work with
+        ArrayList<Folder.Component> Acomponents= newFolder.getComponents();
+        ArrayList<Folder.Component> Bcomponents= oldFolder.getComponents();
 
+
+        if(Bcomponents.get(oldIndex).getComponentName().equals(Acomponents.get(newIndex).getComponentName()))//שמות שווים
+        {
+            if(Acomponents.get(newIndex).getComponentType()!=Bcomponents.get(oldIndex).getComponentType())//שמות שווים, סוג שונה, מצב שלא אמור לקרות
+            {
+                //כנראה האפשרות הזו תימחק לגמרי, אפשר להחזיר הודעת שגיאה שלא ניתן פולדר ובלוב באותו שם
+            }
+            else//שמות שווים, סוג זהה
+            {
+                if(Acomponents.get(newIndex).getComponentType()==FolderType.Blob)//a,b blobs
+                 {
+                    if(Acomponents.get(newIndex).getComponentSHA1()==Bcomponents.get(oldIndex).getComponentSHA1())//שמות שווים, סוג זהה, שא1 זהה
+                    {
+                        //V
+                        // מדובר בקובץ שלא השתנה בו כלום. צריך רק לחזור מהרוקרסיה
+                        //Acomponents.set(newIndex, Bcomponents.get(oldIndex)); // if nothing changed, point at the original tree
+                        //??????????????????????
+                        // אם קיבלתי שני פולדרים מוכנים למה אני צריכה להוסיף את הBlob b לרשימת האובייקטים של הFolder שמכיל את Blob a
+                        return;
+
+                    }
+                    else//שמות שווים, סוג זהה, שניהם בלובים, שא1 שונה
+                    {
+                        //V
+                     // מדובר בקובץ שהתעדכן (זה שהגיע כהאופרטור השמאלי)
+                        Blob b= (Blob) Acomponents.get(newIndex).getDirectObject();
+                        updatedFiles.add(path);
+                        if(isCreateZip)
+                        {
+                            createZipFile(Paths.get(GITRepository.getRepositoryPath().toString() + "\\.magit\\Objects"),
+                                       Acomponents.get(newIndex).getComponentSHA1(),b.getContent());
+                        }
+                    }
+                 }
+                else//a,b folders
+                {
+                    if(Acomponents.get(newIndex).getComponentSHA1()==Bcomponents.get(oldIndex).getComponentSHA1())//שא1 זהה
+                    {
+                        //V
+                        //הפרמטר השמאלי שקיבלנו הוא תיקייה שלא השתנה בה כלום
+                        createShaAndZipForNewCommit(newFolder,newIndex+1,oldFolder, oldIndex+1, isCreateZip, path);
+                    }
+                    else//שא1 שונה
+                    {
+                        //V
+                        //הפרמטר השמאלי שקיבלנו הוא תיקייה שהתעדכנה
+                        Blob b= (Blob) Acomponents.get(newIndex).getDirectObject();
+                        createShaAndZipForNewCommit(new Folder(newFolder.getComponents().get(0)),0,
+                                new Folder(oldFolder.getComponents().get(0)),0 ,isCreateZip, Paths.get(path.toString() + "\\" + Acomponents.get(newIndex).getComponentName()));
+                        updatedFiles.add(path);
+                        if(isCreateZip){
+                        createZipFile(Paths.get(GITRepository.getRepositoryPath().toString() + "\\.magit\\Objects"),
+                                Acomponents.get(newIndex).getComponentSHA1(),b.getContent());}
+                    }
+                }
+            }
+        }
+        else// שמות שונים
+        {
+            if (Acomponents.get(newIndex).getComponentName().compareTo(Bcomponents.get(oldIndex).getComponentName())<0)//a,b כלומר השם של הפולדר החדש קטן יותר
+            {
+                if(Acomponents.get(newIndex).getComponentType()!=Bcomponents.get(oldIndex).getComponentType())// שמות שונים, חדש קטן מישן, סוג שונה
+                {
+                    if(Acomponents.get(newIndex).getComponentType()==FolderType.Folder &&
+                            Bcomponents.get(oldIndex).getComponentType()==FolderType.Blob)// a folder, b blob
+                    {
+                        //הפרמטר השמאלי שקיבלנו הוא תיקייה שנוספה
+                        Blob b= (Blob) Acomponents.get(newIndex).getDirectObject();
+                        createShaAndZipForNewCommit(new Folder(newFolder.getComponents().get(0)),0,
+                                                    new Folder(oldFolder.getComponents().get(0)),0 ,
+                                                    isCreateZip, Paths.get(path.toString() + "\\" + Acomponents.get(newIndex).getComponentName()));
+                        createdFiles.add(path);
+                        if(isCreateZip){
+                        createZipFile(Paths.get(GITRepository.getRepositoryPath().toString() + "\\.magit\\Objects"),
+                                Acomponents.get(newIndex).getComponentSHA1(),b.getContent());}
+                    }
+                    else// a blob, b folder
+                    {
+                        //V
+
+                        //הפרמטר השמאלה שקיבלנו הוא קובץ שנוסף
+                        Blob b= (Blob) Acomponents.get(newIndex).getDirectObject();
+                        createdFiles.add(path);
+                        if(isCreateZip)
+                        {
+                            createZipFile(Paths.get(GITRepository.getRepositoryPath().toString() + "\\.magit\\Objects"),
+                                    Acomponents.get(newIndex).getComponentSHA1(),b.getContent());
+                        }
+                    }
+                }
+                else//שמות שוניפ, חדש קטן מישן, סוג זהה
+                {
+                    if(Acomponents.get(newIndex).getComponentType()==FolderType.Blob)//a,b blobs (מספיק לבדוק רק אחד מהם כי הם זהים)
+                    {
+                        //V
+                        //הפרמטר השמאלי שקיבלנו הוא קובץ שנוסף
+                        Blob b= (Blob) Acomponents.get(newIndex).getDirectObject();
+                        createdFiles.add(path);
+                        if(isCreateZip)
+                        {
+                            createZipFile(Paths.get(GITRepository.getRepositoryPath().toString() + "\\.magit\\Objects"),
+                                    Acomponents.get(newIndex).getComponentSHA1(),b.getContent());
+                        }
+                    }
+                    else//a,b folders
+                    {
+                        //V
+                        //הפרמטר השמאלי שקיבלנו הוא תיקייה שנוספה
+                        Blob b= (Blob) Acomponents.get(newIndex).getDirectObject();
+                        createShaAndZipForNewCommit(new Folder(newFolder.getComponents().get(0)),0,
+                                new Folder(oldFolder.getComponents().get(0)),0 ,
+                                isCreateZip, Paths.get(path.toString() + "\\" + Acomponents.get(newIndex).getComponentName()));
+                        createdFiles.add(path);
+                        if(isCreateZip){
+                            createZipFile(Paths.get(GITRepository.getRepositoryPath().toString() + "\\.magit\\Objects"),
+                                    Acomponents.get(newIndex).getComponentSHA1(),b.getContent());}
+                    }
+                }
+            }
+            else//b,a כלומר השם של הפולדר הישן קטן יותר
+            {
+                if(Acomponents.get(newIndex).getComponentType()!=Bcomponents.get(oldIndex).getComponentType())//סוג שונה
+                {
+                    if(Acomponents.get(newIndex).getComponentType()==FolderType.Folder &&
+                            Bcomponents.get(oldIndex).getComponentType()==FolderType.Blob)//a folder, b blob
+                    {
+                        //V
+                        //הפרמטר השני שקיבלנו הוא תיקייה שנמחקה
+                    }
+                    else//a blob, b folder
+                    {
+                        //V
+                        //הפרמטר השני שקיבלנו הוא קובץ שנמחק
+                    }
+                }
+                else//סוג זהה
+                {
+                    if(Acomponents.get(newIndex).getComponentType()==FolderType.Blob)//a,b blobs
+                    {
+                        //V
+                        //הפרמטר השני שקיבלנו הוא קובץ שנמחק
+                    }
+                    else//a,b folders
+                    {
+                        //V
+                        //הפרמטר השני שקיבלנו הוא תיקייה שנמחקה
+                    }
+                }
+            }
+        }
+    }
+
+
+
+
+/*
     private void createShaAndZipForNewCommit(Folder newFolder, Folder oldFolder, Boolean isCreateZip, Path path) throws IOException {
         ArrayList<Folder.Component> newComponents = newFolder.getComponents();
         ArrayList<Folder.Component> oldComponents;
@@ -129,10 +291,11 @@ public class GitManager {
                     if (oldComponents.get(oldd).getComponentSHA1().equals(newComponents.get(neww).getComponentSHA1())) { //if sha1 is the same
                         //point old object
                         newComponents.set(neww, oldComponents.get(oldd)); // if nothing changed, point at the original tree
-                   neww++;
+                   neww++;b
                    oldd++;
-                    } else if (oldComponents.get(oldd).getComponentType().equals(newComponents.get(neww).getComponentType())) { //different sha1, updated file
-                        if (oldComponents.get(oldd).getComponentType().equals(FolderType.Folder)) {
+                    } else
+                        if (oldComponents.get(oldd).getComponentType().equals(newComponents.get(neww).getComponentType())) { //different sha1, updated file
+                        if (oldComponents.get(oldd).getComponentType().equals(FolderType.Folder)) {//2 פולדרים
                             Folder newf = (Folder) newComponents.get(neww).getDirectObject();
                             Folder oldf = (Folder) oldComponents.get(oldd).getDirectObject();
 
@@ -142,9 +305,9 @@ public class GitManager {
                             createZipFile(objectPath, generateSHA1FromString(newf.getFolderContentString()), newf.getFolderContentString());
                             neww++;
                             oldd++;
-                        } else {
+                        } else {//2 בלובים
                             //both blob - updated
-                            Blob b = (Blob) newComponents.get(neww).getDirectObject();
+                            Blob b = (Blob) newComponents.get(neww).getDirectObject();//יוצר קובץ זיפ חדש ומוסיף לרשימות א הנתיב שלו בוורקינג קופי
                             createZipFile(objectPath, newComponents.get(neww).getComponentSHA1(), b.getContent());
                             //add updated file zip
                             //add to path
@@ -183,7 +346,7 @@ public class GitManager {
                             Folder f = (Folder) newComponents.get(neww).getDirectObject();
 
                             //Folder f = new Folder(newComponents.get(neww));
-                            createShaAndZipForNewCommit(f, null, isCreateZip, Paths.get(path.toString() + "\\" + newComponents.get(neww).getComponentName()));
+                            createShaAndZipForNewCommit(null, f, isCreateZip, Paths.get(path.toString() + "\\" + newComponents.get(neww).getComponentName()));
                             createZipFile(objectPath, generateSHA1FromString(f.getFolderContentString()), f.getFolderContentString());
 
                         }
@@ -192,8 +355,12 @@ public class GitManager {
                     }
                 }
             }
+            //אם הפולדר הישן ריק, צריכה רקורסיה על החדש כדי לבנות אותו
+          //  כל פעם ללכת לוויל
+            //        אם הניו ריק רוצה למחוק את כל הפולדר הישן שקיבלתי וללכת לוויל השני
+              //      ללעטוף באותו if
 
-            while (oldd < oldComponents.size()) {
+            while (oldd < oldComponents.size()) {//נמחקה תיקייה, צריכה להכנס ולמחוק את כל הקבצים שיש בה זה הוויל הזה
                 if (oldComponents.get(oldd).getComponentType().equals(FolderType.Folder)) {
                     Folder f = (Folder) oldComponents.get(oldd).getDirectObject();
 
@@ -205,7 +372,7 @@ public class GitManager {
 
             }
         }
-        while (neww < newComponents.size()) {
+        while (neww < newComponents.size()) {//נוספה תיקייה
             if (newComponents.get(neww).getComponentType().equals(FolderType.Blob)) {
                 Blob b = (Blob) newComponents.get(neww).getDirectObject();
                 createZipFile(objectPath, newComponents.get(neww).getComponentSHA1(), b.getContent());
@@ -224,6 +391,10 @@ public class GitManager {
 
         }
     }
+
+ */
+    //אחד יוצרים אחד כבר קיים
+    //
 
 
     private Folder GenerateFolderFromWC(Path currentPath) {
