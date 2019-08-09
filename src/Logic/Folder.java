@@ -99,7 +99,7 @@ public class Folder implements FileObject{
     }
    static FolderType getTypeFromString(String s)
     {
-        if(Folder.class.toString().equals(s))
+        if("Folder".equals(s))
         {
             return FolderType.Folder;
         }
@@ -160,6 +160,7 @@ public class Folder implements FileObject{
             st.add(Component.getComponentFromString(a));
             i++;
         }
+        br.close();
         return st;
     }
 

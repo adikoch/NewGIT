@@ -14,12 +14,11 @@ import java.util.LinkedList;
 public class Commit {
     private String SHA1="";
     private Folder rootFolder;
-
-
     private String rootFolderSHA1;
 
     //private String rootFolderPathName;// main library repository
     private String SHA1PreveiousCommit;
+
     private String SHA1PrevPrevCommit;
     private String description;
     private String creationDate;
@@ -58,7 +57,12 @@ public class Commit {
 
 
     // getters, setters
-
+    public String getSHA1PrevPrevCommit() {
+        return SHA1PrevPrevCommit;
+    }
+    public void setSHA1PrevPrevCommit(String SHA1PrevPrevCommit) {
+        this.SHA1PrevPrevCommit = SHA1PrevPrevCommit;
+    }
     public String getRootFolderSHA1() {
         return rootFolderSHA1;
     }

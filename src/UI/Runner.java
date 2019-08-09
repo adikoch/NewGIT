@@ -86,7 +86,7 @@ public class Runner {
                 break;
 
             case (10):
-                //CheckOut();
+                CheckOut();
                 break;
 
             case (11):
@@ -162,7 +162,7 @@ public class Runner {
         out.println("Added Files's Paths:" + manager.getCreatedFiles().toString());
         out.println("Updated Files's Paths:" + manager.getUpdatedFiles().toString());
         manager.getCreatedFiles().clear();
-        manager.getCreatedFiles().clear();
+        manager.getDeletedFile().clear();
         manager.getUpdatedFiles().clear();
         //CommitsList.add((newCommit));
 
@@ -265,6 +265,17 @@ public class Runner {
         return true;
     }
 
+    private void CheckOut()
+    {
+        out.println("Please enter the name of the branch to move over to");
+        Scanner sc= new Scanner(System.in);
+        String branchName= sc.nextLine();
+        try {
+            manager.executeCheckout(branchName);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 
 }
