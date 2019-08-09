@@ -81,7 +81,7 @@ public class Repository {
 
         for (File f : allBranches) {
             {
-                if(f.getName() != "Head") {
+                if(!f.getName().equals("Head")) {
                     fileContent = GitManager.readTextFile(f.toString());
                     this.branches.add(new Branch(f.getName(), fileContent));
                 }
