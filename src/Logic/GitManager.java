@@ -65,10 +65,6 @@ public class GitManager {
 
     }
 
-    public void ShowStatus() {
-
-
-    }
 
     public void ExecuteCommit(String description, Boolean isCreateZip) throws Exception {
         Path ObjectPath = Paths.get(GITRepository.getRepositoryPath().toString() + "\\.magit\\Objects");
@@ -192,6 +188,7 @@ public class GitManager {
                 }
             }
         }
+
         if (oldFolder != null) {
             oldComponents = oldFolder.getComponents();
             while (oldd < oldComponents.size()) {
@@ -276,7 +273,6 @@ public class GitManager {
             throw new Exception();
         File file = new File(GITRepository.getRepositoryPath().toString() + "\\" + ".magit\\branches\\" + FileName);
         file.delete();//// erasing it physically
-        System.out.println("Branch deleted successfully");
 
         Branch branch = GITRepository.getBranchByName(FileName);
         GITRepository.getBranches().remove(branch);// erasing it logically
@@ -591,6 +587,8 @@ public class GitManager {
 
     public void executeCheckout(String branchName) throws Exception {
         Branch b = GITRepository.getBranchByName(branchName);
+        //add question to user
+
         GITRepository.setHeadBranch(b);
         deleteFilesInWC(GITRepository.getRepositoryPath().toFile());
         Commit c = GITRepository.getHeadBranch().getPointedCommit();
@@ -624,6 +622,4 @@ public class GitManager {
                             }
         }
     }
-
-
 }
