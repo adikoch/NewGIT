@@ -8,47 +8,31 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class Folder implements FileObject{
-    //private  Integer folderID;
-    //private String blobName;
-    //private String sha1;//content
-    //private String lastUpdater;
-    //private Date lastUpdateDate;
-    //Enum folderType;
-    //List<component> items;//sha1
-    //Boolean isRoot;
 
-
-
+    //members
     private ArrayList<Component> components;
-    //private String SHA1;
 
-    Folder(Component c)
-    {
-        components = new ArrayList<>();
-        components.add(c);
-    }
+    //con
+//    Folder(Component c)
+//    {
+//        components = new ArrayList<>();
+//        components.add(c);
+//    }
     Folder(ArrayList<Component> list) {
         components = list;
     }
 
+
     protected static class Component implements Comparable<Component> , FileObject{
+        //members
         private FolderType type;
         private String Sha1;
         private String name;
         private String lastUpdater;
         private String lastUpdateDate;
-
         private FileObject directObject;
 
-        public FileObject getDirectObject() {
-            return directObject;
-        }
-
-        void setDirectObject(FileObject directObject) {
-            this.directObject = directObject;
-        }
-
-
+        //con
         Component(String name, String sha1, FolderType type, String lastUpdater, String lastUpdateDate){
 
             this.type= type;
@@ -58,21 +42,26 @@ public class Folder implements FileObject{
             this.lastUpdater=lastUpdater;
 
         }       // from text/xml file
-        public void Compnenet() {}
 
+
+        //get\set
+        public FileObject getDirectObject() { return directObject; }
+        void setDirectObject(FileObject directObject) { this.directObject = directObject; }
+
+        FolderType getComponentType() {return type;}
+
+        String getComponentSHA1() { return Sha1;}
+
+        String  getComponentName() {return name;}
+
+        String  getFolderSHA1() {return Sha1;}
+
+        //methods
         //comperator
         public int compareTo(Component folderComponent) {
             return this.name.compareTo(folderComponent.name);
         }
-        FolderType getComponentType() {return type;}
-        String getComponentSHA1() { return Sha1;}
-        String  getComponentName() {return name;}
-        String  getFolderSHA1() {return Sha1;}
 
-//        public void createObj()
-//        {
-//
-//        }
 
         String getComponentsStringFromComponent() {
             StringBuilder content = new StringBuilder();
@@ -89,7 +78,7 @@ public class Folder implements FileObject{
 
         }
 
-       static Component getComponentFromString  (String s) throws IOException
+       static Component getComponentFromString  (String s)
         {
             String[] st =  s.split(",");
             Component c = new Component(st[0],st[1],getTypeFromString(st[2]),st[3], st[4]);
@@ -97,6 +86,24 @@ public class Folder implements FileObject{
         }
 
     }
+
+    //con
+    Folder() // creating by XML or new empty root
+    {
+        components = new ArrayList<>();
+
+    }
+
+    public Folder(File file) //creating by text file
+    {
+
+    }
+
+    //set\get
+    public void setComponents(ArrayList<Component> components) { this.components = components; }
+    ArrayList<Component> getComponents() { return this.components; }
+
+    //methods
    static FolderType getTypeFromString(String s)
     {
         if("Folder".equals(s))
@@ -109,9 +116,7 @@ public class Folder implements FileObject{
         }
     }
 
-    public void setComponents(ArrayList<Component> components) {
-        this.components = components;
-    }
+
     String stringComponentsToString() {
         StringBuilder content = new StringBuilder();
         for (Component a : components) {
@@ -121,35 +126,7 @@ public class Folder implements FileObject{
         return content.toString();
     }
 
-    Folder() // creating by XML or new empty root
-    {
-        //SHA1 = org.apache.commons.codec.digest.DigestUtils.sha1Hex("");
-        components = new ArrayList<>();
 
-    }
-
-    public Folder(File file) //creating by text file
-    {
-
-    }
-
-//    public String getSHA1() {
-//        return SHA1;
-//    }
-//    public String toString()
-//    {
-//        return "dsd";
-//    }
-
-
-    public void exportToFile() // check if the sha1 exist
-    {
-
-    }
-
-    ArrayList<Component> getComponents() {
-        return this.components;
-    }
 
     ArrayList<Component> setComponentsFromString(String compomemtString) throws IOException {
         BufferedReader br = new BufferedReader(new StringReader(compomemtString));
@@ -176,7 +153,10 @@ public class Folder implements FileObject{
         return sb.toString();
     }
 
-
+//    public void exportToFile() // check if the sha1 exist
+//    {
+//
+//    }
 }
 
 

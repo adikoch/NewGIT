@@ -1,7 +1,6 @@
 package Logic;
 
 import java.io.*;
-import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -13,59 +12,34 @@ import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 public class GitManager {
+
+    //members
     private Repository GITRepository;
     private String userName;
 
     //    private class diffLogClass {
-    private LinkedList<Path> updatedFiles = new LinkedList<Path>();
-    private LinkedList<Path> createdFiles = new LinkedList<Path>();
-    private LinkedList<Path> deletedFiles = new LinkedList<Path>();
+    private LinkedList<Path> updatedFiles = new LinkedList<>();
+    private LinkedList<Path> createdFiles = new LinkedList<>();
+    private LinkedList<Path> deletedFiles = new LinkedList<>();
     // }
 
+//get\set
+    public LinkedList<Path> getUpdatedFiles() { return updatedFiles; }
+    public LinkedList<Path> getCreatedFiles() { return createdFiles; }
+    public LinkedList<Path> getDeletedFiles() { return deletedFiles; }
 
-    public LinkedList<Path> getUpdatedFiles() {
-        return updatedFiles;
-    }
+    public Repository getGITRepository() { return GITRepository; }
 
-    public LinkedList<Path> getCreatedFiles() {
-        return createdFiles;
-    }
-
-    public LinkedList<Path> getDeletedFile() {
-        return deletedFiles;
-    }
-
-    public Repository getGITRepository() {
-        return GITRepository;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
+    public String getUserName() { return userName; }
+    public void updateNewUserNameInLogic(String NewUserName) { userName = NewUserName; }
 
 
-    public static String generateSHA1FromFile(File file) {
-        String str = file.toString();
-        return generateSHA1FromString(str);
-    }
-
-    static String generateSHA1FromString(String str) {
-        return org.apache.commons.codec.digest.DigestUtils.sha1Hex(str);
-    }
-
-    public void updateNewUserNameInLogic(String NewUserName) {
-        userName = NewUserName;
-    }
-
-    public void ImportRepFromXML() {
-
-    }
-
-    public void ShowFilesOfCurrCommit() {
-
-    }
+    static String generateSHA1FromString(String str) { return org.apache.commons.codec.digest.DigestUtils.sha1Hex(str); }
 
 
+
+
+//methods
     public void ExecuteCommit(String description, Boolean isCreateZip) throws Exception {
         Path ObjectPath = Paths.get(GITRepository.getRepositoryPath().toString() + "\\.magit\\Objects");
         Path BranchesPath = Paths.get(GITRepository.getRepositoryPath().toString() + "\\.magit\\Branches");
@@ -75,7 +49,7 @@ public class GitManager {
         //String creationDate = GitManager.getDate();
 
         Folder newFolder = GenerateFolderFromWC(GITRepository.getRepositoryPath());// ייצג את הספרייה הראשית
-        Folder oldFolder = GITRepository.getHeadBranch().getPointedCommit().getRootfolder();
+        Folder oldFolder = GITRepository.getHeadBranch().getPointedCommit().getRootFolder();
         if (!generateSHA1FromString(newFolder.getFolderContentString()).equals(generateSHA1FromString(oldFolder.getFolderContentString()))) {
             createShaAndZipForNewCommit(newFolder, oldFolder, isCreateZip, GITRepository.getRepositoryPath());
 
@@ -285,7 +259,6 @@ public class GitManager {
 
     public void CreatBranch(String newBranchName) {
         Path pathOfNewFile = Paths.get(getGITRepository().getRepositoryPath().toString() + "\\" + ".magit\\branches\\");
-        //Path workingPath = Paths.get(repPath + repName + "\\");
         String nameOfBranch = readTextFile(getGITRepository().getRepositoryPath().toString() + "\\" + ".magit\\branches\\Head");//name of main branch
         String sha1OfCurrCommit = readTextFile(getGITRepository().getRepositoryPath().toString() + "\\" + ".magit\\branches\\" + nameOfBranch);//sha1 of main commit
         createFile(newBranchName, sha1OfCurrCommit, pathOfNewFile);// a file created in branches
@@ -356,7 +329,7 @@ public class GitManager {
                 String name = readTextFile(newRepPath + "\\.magit\\branches\\" + content);
                 this.GITRepository = new Repository(newRepPath);
 
-                this.GITRepository.getRepositorysBranchesObjecets();
+                this.GITRepository.getRepositorysBranchesObjects();
                 GITRepository.Switch(newRepPath);
                 GITRepository.setHeadBranch(GITRepository.getBranchByName(content));
 
@@ -417,7 +390,6 @@ GITRepository.getCommitList().put(newCommit.getSHA(),newCommit);
 
 
     private static void createFileInMagit(Object obj, Path path) throws Exception {
-        Class objClass = obj.getClass();
         Path magitPath = Paths.get(path.toString() + "\\.magit");
         Path objectsPath = Paths.get(magitPath.toString() + "\\objects");
         Path branchesPath = Paths.get(magitPath.toString() + "\\branches");
@@ -570,13 +542,6 @@ GITRepository.getCommitList().put(newCommit.getSHA(),newCommit);
 
     }
 
-    public static File getFileFromSHA1(String ShA1, Path path) {
-        Path objectsPath = Paths.get(path.toString() + "\\objects");
-        File f = Paths.get(objectsPath + ShA1 + ".zip").toFile();
-        return f;
-
-    }
-
     @Override
     public String toString() {
         String separator = System.lineSeparator() + "***" + System.lineSeparator();
@@ -647,4 +612,24 @@ GITRepository.getCommitList().put(newCommit.getSHA(),newCommit);
         }
 
     }
+
+
+//    public static File getFileFromSHA1(String ShA1, Path path) {
+//        Path objectsPath = Paths.get(path.toString() + "\\objects");
+//        File f = Paths.get(objectsPath + ShA1 + ".zip").toFile();
+//        return f;
+//
+//    }
+//    public static String generateSHA1FromFile(File file) {
+//        String str = file.toString();
+//        return generateSHA1FromString(str);
+//    }
+
+//    public void ImportRepFromXML() {
+//
+//    }
+//
+//    public void ShowFilesOfCurrCommit() {
+//
+//    }
 }

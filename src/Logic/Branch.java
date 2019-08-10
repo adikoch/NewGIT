@@ -1,22 +1,16 @@
 package Logic;
 
-import java.util.HashSet;
-
 public class Branch {
+
+    //members
+    private String branchName;
+    private Commit pointedCommit;
+    private  String pointedCommitSHA1="";
+
     Boolean isTracking;
     Boolean isRemote;
 
-   private String branchName;
-    private Commit pointedCommit;
-
-
-
-    private  String pointedCommitSHA1="";
-
-    void setPointedCommitSHA1(String pointedCommit) {
-        pointedCommitSHA1 = pointedCommit;
-    }
-
+    //con
     Branch(String name)
     {
         branchName = name;
@@ -26,34 +20,16 @@ public class Branch {
         branchName = name;
         pointedCommitSHA1 = commitSHA1;
     }
-    public String getPointedCommitSHA1() {
-        return pointedCommitSHA1;
-    }
-
-    public String getBranchName()
-    {
-        return branchName;
-    }
-
-    public Commit getPointedCommit()
-    {
-        return pointedCommit;
-    }
-
-    void setPointedCommit(Commit newC)
-    {
-        pointedCommit=newC;
-    }
 
 
+    //set\get
 
-    //  tracking true
-//    String branchName;
-//    Integer pointedCommit;
-//    String trackingAfter;
+    public String getPointedCommitSHA1() { return pointedCommitSHA1; }
+    void setPointedCommitSHA1(String pointedCommit) { pointedCommitSHA1 = pointedCommit; }
 
-    //is remote true
-//    String branchName;
-//    Integer pointedCommit;
+    public String getBranchName() { return branchName; }
+
+    public Commit getPointedCommit() { return pointedCommit; }
+    void setPointedCommit(Commit newC) { pointedCommit=newC; }
 
 }
