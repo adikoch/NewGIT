@@ -254,11 +254,11 @@ public class Runner {
             out.println("Repository's User:" + manager.getUserName());
             try {
                 manager.ExecuteCommit("",false);
-                out.println("Deleted Files's Paths:" + manager.getDeletedFile());
+                out.println("Deleted Files's Paths:" + manager.getDeletedFiles());
                 out.println("Added Files's Paths:" + manager.getCreatedFiles());
                 out.println("Updated Files's Paths:" + manager.getUpdatedFiles());
                 manager.getCreatedFiles().clear();
-                manager.getDeletedFile().clear();
+                manager.getDeletedFiles().clear();
                 manager.getUpdatedFiles().clear();
             } catch (Exception e) {
                 out.println("Show Status Failed! Unable to create files");}

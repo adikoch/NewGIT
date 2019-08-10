@@ -60,7 +60,7 @@ public class Repository {
 
     public MagitRepository loadFromXml(String i_XmlPath) throws FileNotFoundException, JAXBException {
             InputStream inputStream = new FileInputStream(i_XmlPath);
-            JAXBContext jc = JAXBContext.newInstance("Resources.jaxb.schema.generated");
+            JAXBContext jc = JAXBContext.newInstance("Resources.jaxb");
             Unmarshaller u = jc.createUnmarshaller();
             return (MagitRepository) u.unmarshal(inputStream);
     }
