@@ -54,7 +54,7 @@ public class Runner {
                 break;
 
             case (2):
-                //ImportRepFromXML();
+                ImportRepFromXML();
                 break;
 
             case (3):
@@ -94,7 +94,7 @@ public class Runner {
                 break;
 
             case (12):
-                createEmptyRepository();//validation V
+                //createEmptyRepository();//validation V
                 break;
 
             case (13):
@@ -157,11 +157,11 @@ public class Runner {
             manager.ExecuteCommit(description, true);
         } catch (Exception e) {
             out.println("Commit Failed! Unable to create files");}
-        out.println("Deleted Files's Paths:" + manager.getDeletedFile().toString());
+        out.println("Deleted Files's Paths:" + manager.getDeletedFiles().toString());
         out.println("Added Files's Paths:" + manager.getCreatedFiles().toString());
         out.println("Updated Files's Paths:" + manager.getUpdatedFiles().toString());
         manager.getCreatedFiles().clear();
-        manager.getDeletedFile().clear();
+        manager.getDeletedFiles().clear();
         manager.getUpdatedFiles().clear();
         //CommitsList.add((newCommit));
 
@@ -191,34 +191,34 @@ public class Runner {
         manager.CreatBranch(newBranchName);
     }
 
-    private void createEmptyRepository() {
-        boolean isValid=false;
-        Scanner sc = new Scanner(System.in);
-        String repPath= null;
-        String repName= null;
-
-        while(repPath==null || !manager.DoesPathExist(repPath))
-        {
-
-        }
-
-        while(true) {//does path exist
-            out.println("Enter the full path for the new repository: ");
-            String repPath = sc.nextLine();
-            out.println("Choose name for the new repository: ");
-            String repName = sc.nextLine();
-            try {
-                manager.createEmptyRepositoryFolders(repPath, repName);
-                isValid=true;
-            }
-            catch (IllegalArgumentException e) {
-                out.println("The wanted name already exist, please try again");
-                isValid=false;}
-            catch (ExceptionInInitializerError er) {
-                out.println("The wanted path does not exist, please try again");
-                isValid=false;}
-        }
-    }
+//    private void createEmptyRepository() {
+//        boolean isValid=false;
+//        Scanner sc = new Scanner(System.in);
+//        String repPath= null;
+//        String repName= null;
+//
+//        while(repPath==null || !manager.DoesPathExist(repPath))
+//        {
+//
+//        }
+//
+//        while(true) {//does path exist
+//            out.println("Enter the full path for the new repository: ");
+//            String repPath = sc.nextLine();
+//            out.println("Choose name for the new repository: ");
+//            String repName = sc.nextLine();
+//            try {
+//                manager.createEmptyRepositoryFolders(repPath, repName);
+//                isValid=true;
+//            }
+//            catch (IllegalArgumentException e) {
+//                out.println("The wanted name already exist, please try again");
+//                isValid=false;}
+//            catch (ExceptionInInitializerError er) {
+//                out.println("The wanted path does not exist, please try again");
+//                isValid=false;}
+//        }
+//    }
 
     /*
         private void createEmptyRepository() {
@@ -305,7 +305,7 @@ public class Runner {
         String branchName= sc.nextLine();
         try {
             manager.ExecuteCommit("", false);
-            if (manager.getDeletedFile().size() != 0 ||
+            if (manager.getDeletedFiles().size() != 0 ||
                     manager.getUpdatedFiles().size() != 0 ||
                     manager.getCreatedFiles().size() != 0) {
                 out.println("There are unsaved changes in the WC. would you like to save it before checkout?" );
@@ -317,7 +317,7 @@ public class Runner {
             }
                 manager.executeCheckout(branchName);
             manager.getCreatedFiles().clear();
-            manager.getDeletedFile().clear();
+            manager.getDeletedFiles().clear();
             manager.getUpdatedFiles().clear();
         }catch (Exception e) {
             e.printStackTrace();
@@ -332,6 +332,13 @@ public class Runner {
             out.println("Unable to generate folder from commit object");}
     }
 
+    private void ImportRepFromXML()
+    {
+        out.println("Please enter the path of the xml file to import");
+        Scanner sc= new Scanner(System.in);
+        String xmlPath= sc.nextLine();
+        manager.ImportRepositoryFromXML(xmlPath);
+    }
 
 
 

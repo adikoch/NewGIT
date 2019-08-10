@@ -1,11 +1,11 @@
 package Logic;
 
+import jaxb.schema.generated.*;
+
+
 import java.io.*;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class Folder implements FileObject{
 
@@ -26,6 +26,9 @@ public class Folder implements FileObject{
     protected static class Component implements Comparable<Component> , FileObject{
         //members
         private FolderType type;
+
+
+
         private String Sha1;
         private String name;
         private String lastUpdater;
@@ -51,7 +54,7 @@ public class Folder implements FileObject{
         FolderType getComponentType() {return type;}
 
         String getComponentSHA1() { return Sha1;}
-
+        public void setSha1(String sha1) { Sha1 = sha1; }
         String  getComponentName() {return name;}
 
         String  getFolderSHA1() {return Sha1;}
@@ -152,6 +155,54 @@ public class Folder implements FileObject{
 
         return sb.toString();
     }
+
+    public static Map<String, Component>  getAllBlobsToMap(MagitBlobs blobs)
+    {
+       List<MagitBlob> oldlist = blobs.getMagitBlob();
+        Map<String,Component> newMap = new HashMap<>();
+        for(MagitBlob blob: oldlist)
+        {
+            String sha1 = GitManager.generateSHA1FromString(blob.getContent());
+            Component c = new Component(blob.getName(),sha1,FolderType.Blob,blob.getLastUpdater(),blob.getLastUpdateDate());
+            newMap.put(blob.getId(),c);
+            Blob b = new Blob(blob.getContent());
+            c.setDirectObject(b);
+        }
+        return newMap;
+    }
+
+    public static Map<String, Component>  getAllFoldersToMap(MagitFolders folders)
+    {
+        List<MagitSingleFolder> oldlist = folders.getMagitSingleFolder();
+        Map<String,Component> newMap = new HashMap<>();
+        for(MagitSingleFolder folder: oldlist)
+        {
+            //String sha1 = GitManager.generateSHA1FromString(folder);
+            Component c = new Component(folder.getName(),null,FolderType.Folder,folder.getLastUpdater(),folder.getLastUpdateDate());
+            newMap.put(folder.getId(),c);
+            //Folder f = new Folder(f.getContent());
+            //c.setDirectObject(b);
+        }
+        return newMap;
+
+    }
+    public static void createListOfComponents( Map<String,Component> folderList,Map<String,Component> blobList,MagitFolders folders)//create list of component to each folder
+    {
+        List<MagitSingleFolder> oldlist = folders.getMagitSingleFolder();
+        for (MagitSingleFolder f : oldlist) {
+            Folder folder = new Folder();
+            folder.components = new ArrayList<>();
+            for (Item i : f.getItems().getItem()) {
+                if (i.getType().equals("Folder")) {
+                    folder.components.add(folderList.get(i.getId()));
+                } else {
+                    folder.components.add(blobList.get(i.getId()));
+                }
+            }
+            folderList.get(f.getId()).setDirectObject(new Folder());
+        }
+    }
+
 
 //    public void exportToFile() // check if the sha1 exist
 //    {

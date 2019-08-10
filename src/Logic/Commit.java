@@ -1,15 +1,26 @@
 package Logic;
 
+import jaxb.schema.generated.MagitCommits;
+import jaxb.schema.generated.MagitFolders;
+import jaxb.schema.generated.MagitSingleCommit;
+import jaxb.schema.generated.MagitSingleFolder;
+
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 public class Commit {
-    private String SHA1="";
+    private String SHA1;
     private Folder rootFolder;
     private String rootFolderSHA1;
     private String SHA1PreveiousCommit;
     private String SHA1PrevPrevCommit;
     private String description;
+
+
+
     private String creationDate;
     private String changer;
     private String SHAContent;
@@ -51,17 +62,20 @@ public class Commit {
     public String getSHAContent() { return SHAContent; }
 
     public Folder getRootFolder() { return rootFolder; }
-    public void setOrigCommit(Folder folder) { rootFolder =  folder;}
+    public void setRootFolder(Folder folder) { rootFolder =  folder;}
 
     public String getSHA1PreveiousCommit() { return SHA1PreveiousCommit; }
     public void setSHA1PreveiousCommit(String SHA1PreveiousCommit) { this.SHA1PreveiousCommit = SHA1PreveiousCommit; }
 
+    public void setChanger(String changer) { this.changer = changer; }
 
     public void setSHA1(String SHA1) { this.SHA1=SHA1; }
     public String getSHA(){ return SHA1; }
 
     public String getDescription (){ return description;}
+    public void setDescription (String descriptionFromUser){ description =  descriptionFromUser; }
 
+    public void setCreationDate(String creationDate) { this.creationDate = creationDate; }
 
         //methods
     public void setCommitFileContentToSHA() {
@@ -86,7 +100,26 @@ public class Commit {
         SHA1 = GitManager.generateSHA1FromString(s.toString());
         SHAContent = s.toString();
     }
-
+    public static Map<String, Commit> getAllCommitsToMap(MagitCommits commits, Map<String, Folder.Component> folderList)
+    {
+        Map<String, Commit> newMap = new HashMap<>();
+        List<MagitSingleCommit> commitlist = commits.getMagitSingleCommit();
+        for(MagitSingleCommit c: commitlist)
+        {
+            ArrayList<String> args = new ArrayList<>();
+            String rootFolderID = c.getRootFolder().getId();
+            String rootFolderSHA1 = folderList.get(rootFolderID).getFolderSHA1();
+            args.set(0,rootFolderSHA1);
+            args.set(1,null);
+            args.set(2,null);
+            args.set(3,c.getMessage());
+            args.set(4,c.getDateOfCreation());
+            args.set(5,c.getAuthor());
+            Commit newcommit = new Commit(args);
+            newMap.put(c.getId(),newcommit);
+        }
+        return newMap;
+    }
 
 //    public void exportToFile()
 //    {

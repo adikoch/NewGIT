@@ -1,6 +1,6 @@
 package Logic;
 
-import Resources.jaxb.MagitRepository;
+import jaxb.schema.generated.MagitRepository;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -64,6 +64,12 @@ public class Repository {
             Unmarshaller u = jc.createUnmarshaller();
             return (MagitRepository) u.unmarshal(inputStream);
     }
+
+       public void insertMembersToNewRepository(MagitRepository oldRepo)
+       {
+           path = Paths.get(oldRepo.getLocation());
+           repositoryName = oldRepo.getName();
+       }
 
     //methods
     void Switch(Path newPath) { path = newPath; }

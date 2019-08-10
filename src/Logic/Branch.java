@@ -1,5 +1,9 @@
 package Logic;
 
+import jaxb.schema.generated.MagitBranches;
+
+import java.util.Map;
+
 public class Branch {
 
     //members
@@ -32,4 +36,11 @@ public class Branch {
     public Commit getPointedCommit() { return pointedCommit; }
     void setPointedCommit(Commit newC) { pointedCommit=newC; }
 
+
+    //methods
+    public static Map<String, Folder.Component> getAllBranchesToMap(MagitBranches branches)
+    {
+
+
+    }
 }
