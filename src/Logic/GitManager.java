@@ -1,7 +1,6 @@
 package Logic;
 
 import java.io.*;
-import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -325,7 +324,17 @@ public class GitManager {
         } else throw new ExceptionInInitializerError(); // the wanted path doesnt exist
     }
 
-    //מכאן רוצה להוציא שני אקספשנס שונים שכל אחד יסמל בעיה אחרת
+
+    public boolean DoesPathExist(String repPath)
+    {
+        return Files.exists(Paths.get(repPath));
+    }
+
+    private boolean isFileMagit(String repPath)
+    {
+        return Files.exists(Paths.get(repPath));
+    }
+
     public void switchRepository(Path newRepPath)
             throws ExceptionInInitializerError, UnsupportedOperationException, IllegalArgumentException, IOException {
         Path checkIfMagit = Paths.get(newRepPath + "\\.magit");
@@ -348,6 +357,31 @@ public class GitManager {
         } else throw new IllegalArgumentException();//exception for not existing
 
     }
+
+    /*
+        public void switchRepository(Path newRepPath)
+            throws ExceptionInInitializerError, UnsupportedOperationException, IllegalArgumentException, IOException {
+        Path checkIfMagit = Paths.get(newRepPath + "\\.magit");
+        if (Files.exists(newRepPath)) {
+            if (Files.exists(checkIfMagit)) {
+
+                File f = Paths.get(newRepPath.toString() + "\\.magit\\branches\\Head").toFile();
+                String content = readTextFile(newRepPath + "\\.magit\\branches\\" + f.getName());
+                String name = readTextFile(newRepPath + "\\.magit\\branches\\" + content);
+                this.GITRepository = new Repository(newRepPath);
+
+                this.GITRepository.getRepositorysBranchesObjecets();
+                GITRepository.Switch(newRepPath);
+                GITRepository.setHeadBranch(GITRepository.getBranchByName(content));
+
+
+                getCommitForBranches(newRepPath);
+            } else throw new ExceptionInInitializerError();//exeption forG not being magit
+
+        } else throw new IllegalArgumentException();//exception for not existing
+
+    }
+     */
 
     public void getCommitForBranches(Path newRepPath) throws IOException {
         for (Branch b : GITRepository.getBranches()) {
@@ -612,7 +646,7 @@ public class GitManager {
     }
 
     public void createFilesInWCFromCommitObject(Folder rootFolder, Path pathForFile) throws Exception {
-
+        //
         for (Folder.Component c : rootFolder.getComponents()) {
 
             if (c.getComponentType().equals(FolderType.Blob)) {
@@ -625,5 +659,43 @@ public class GitManager {
         }
     }
 
+    //inbar, need to debug
+
+    public String showFilesOfCommit() throws IOException {
+        Commit commit= GITRepository.getHeadBranch().getPointedCommit();
+        //build a folder that represents the commit
+        Folder folder= generateFolderFromCommitObject(commit.getSHA());
+        return showFilesOfCommitRec(folder, "");
+    }
+
+
+                                    //commitFolder
+    public String showFilesOfCommitRec(Folder rootFolder, String toPrint){
+        //
+        StringBuilder builder= new StringBuilder();
+        builder.append(toPrint);
+        for (Folder.Component c : rootFolder.getComponents()) {
+
+            if (c.getComponentType().equals(FolderType.Blob)) {
+                builder.append(c.getComponentsStringFromComponent());
+                return builder.toString();
+                //add blob component to string, return;
+            } else {
+                builder.append(c.getComponentName());
+                builder.append(":");
+                builder.append(System.lineSeparator());
+                builder.append(c.getComponentsStringFromComponent());
+                builder.append(showFilesOfCommitRec((Folder)c.getDirectObject(), toPrint));
+            }
+        }
+        builder.append(System.lineSeparator());
+        return builder.toString();
+
+    }
 
 }
+
+//אקספשנים
+//הפונקציה של אופציה 4 בתפריט V
+//לבדוק אם עשיתי סוויצ רפוזטורי עדיין מדפיס לי V
+//אם עושים סוויצ רפוזטורי פעולה 11 לא עובדת, יכול להיות בגלל 2 סיבות: או שאין קישור בין קומיט לאבא שלו באובייקט עצמו, או שבסווית רפוזטורי לא מעדכנות את ההד להצביע על הקומיט הנחוץ

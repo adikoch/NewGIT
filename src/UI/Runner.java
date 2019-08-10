@@ -62,7 +62,7 @@ public class Runner {
                 break;
 
             case (4):
-                //ShowFilesOfCurrCommit();
+                ShowFilesOfCurrCommit();
                 break;
 
             case (5):
@@ -106,8 +106,7 @@ public class Runner {
 
     }
 
-    private void ShowHistoryOfActiveBranch() {
-        //מהבראנצ שיש כרגע בתוך ההד, רוצה להציג את כל האחורה שלו כלומר רקורסיבית כל פעם ללכת לאבא ולהדפיס את הקומיט עד שיש נאל
+    private void ShowHistoryOfActiveBranch() {//לא עובד במקרה שעושים סוויץ רפוזטורי
         manager.ShowHistoryActiveBranch();
     }
 
@@ -195,6 +194,36 @@ public class Runner {
     private void createEmptyRepository() {
         boolean isValid=false;
         Scanner sc = new Scanner(System.in);
+        String repPath= null;
+        String repName= null;
+
+        while(repPath==null || !manager.DoesPathExist(repPath))
+        {
+
+        }
+
+        while(true) {//does path exist
+            out.println("Enter the full path for the new repository: ");
+            String repPath = sc.nextLine();
+            out.println("Choose name for the new repository: ");
+            String repName = sc.nextLine();
+            try {
+                manager.createEmptyRepositoryFolders(repPath, repName);
+                isValid=true;
+            }
+            catch (IllegalArgumentException e) {
+                out.println("The wanted name already exist, please try again");
+                isValid=false;}
+            catch (ExceptionInInitializerError er) {
+                out.println("The wanted path does not exist, please try again");
+                isValid=false;}
+        }
+    }
+
+    /*
+        private void createEmptyRepository() {
+        boolean isValid=false;
+        Scanner sc = new Scanner(System.in);
 
         while(!isValid) {
             out.println("Enter the full path for the new repository: ");
@@ -213,6 +242,7 @@ public class Runner {
                 isValid=false;}
         }
     }
+     */
 
 
 
@@ -276,6 +306,16 @@ public class Runner {
             e.printStackTrace();
         }
     }
+
+    private void ShowFilesOfCurrCommit()
+    {
+        try{
+        manager.showFilesOfCommit();}
+        catch(Exception e) {
+            out.println("Unable to generate folder from commit object");}
+    }
+
+
 
 
 }
