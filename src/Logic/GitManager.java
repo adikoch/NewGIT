@@ -136,14 +136,21 @@ public class GitManager {
                                 Folder oldf = (Folder) oldComponents.get(oldd).getDirectObject();
 
                                 createShaAndZipForNewCommit(newf, oldf, isCreateZip, Paths.get(path.toString() + "\\" + oldComponents.get(oldd).getComponentName()));
-                                createZipFile(objectPath, generateSHA1FromString(newf.getFolderContentString()), newf.getFolderContentString());
+                                if(isCreateZip == Boolean.TRUE) {
+                                    createZipFile(objectPath, generateSHA1FromString(newf.getFolderContentString()), newf.getFolderContentString());
+                                }
                                 neww++;
                                 oldd++;
                             } else {
                                 //both blob - updated
-                                Blob b = (Blob) newComponents.get(neww).getDirectObject();
-                                createZipFile(objectPath, newComponents.get(neww).getComponentSHA1(), b.getContent());
-                                //add updated file zip
+                                if(isCreateZip == Boolean.TRUE) {
+                                    File f = new File(objectPath.toString() + "\\" + newComponents.get(neww).getComponentSHA1() + ".zip");
+                                    if (!f.exists()) {
+                                        Blob b = (Blob) newComponents.get(neww).getDirectObject();
+                                        createZipFile(objectPath, newComponents.get(neww).getComponentSHA1(), b.getContent());
+                                        //add updated file zip
+                                    }
+                                }
                                 //add to path
                                 this.updatedFiles.add(Paths.get(path.toString() + "\\" + newComponents.get(neww).getComponentName()));
                                 neww++;
@@ -158,7 +165,6 @@ public class GitManager {
                             if (oldComponents.get(oldd).getComponentType().equals(FolderType.Folder)) {
                                 Folder f = (Folder) oldComponents.get(oldd).getDirectObject();
 
-                                //Folder f = new Folder(newComponents.get(neww));
                                 createShaAndZipForNewCommit(null, f, isCreateZip, Paths.get(path.toString() + "\\" + oldComponents.get(oldd).getComponentName()));
                             }
                             this.deletedFiles.add(Paths.get(path.toString() + "\\" + oldComponents.get(oldd).getComponentName()));
@@ -171,15 +177,22 @@ public class GitManager {
 
                             //add to list
                             if (newComponents.get(neww).getComponentType().equals(FolderType.Blob)) {
-                                Blob b = (Blob) newComponents.get(neww).getDirectObject();
-                                createZipFile(objectPath, newComponents.get(neww).getComponentSHA1(), b.getContent());
+                                if(isCreateZip == Boolean.TRUE) {
+                                    File f = new File(objectPath.toString() + "\\" + newComponents.get(neww).getComponentSHA1() + ".zip");
+                                    if (!f.exists()) {
+                                        Blob b = (Blob) newComponents.get(neww).getDirectObject();
+                                        createZipFile(objectPath, newComponents.get(neww).getComponentSHA1(), b.getContent());
+                                    }
+                                }
                             } else {
                                 Folder f = (Folder) newComponents.get(neww).getDirectObject();
 
                                 //Folder f = new Folder(newComponents.get(neww));
                                 createShaAndZipForNewCommit(f, null, isCreateZip, Paths.get(path.toString() + "\\" + newComponents.get(neww).getComponentName()));
-                                createZipFile(objectPath, generateSHA1FromString(f.getFolderContentString()), f.getFolderContentString());
+                                if(isCreateZip == Boolean.TRUE) {
 
+                                    createZipFile(objectPath, generateSHA1FromString(f.getFolderContentString()), f.getFolderContentString());
+                                }
                             }
                             this.createdFiles.add(Paths.get(path.toString() + "\\" + newComponents.get(neww).getComponentName()));
                             neww++;
@@ -207,21 +220,37 @@ public class GitManager {
             newComponents = newFolder.getComponents();
             while (neww < newComponents.size()) {
                 if (newComponents.get(neww).getComponentType().equals(FolderType.Blob)) {
-                    Blob b = (Blob) newComponents.get(neww).getDirectObject();
-                    createZipFile(objectPath, newComponents.get(neww).getComponentSHA1(), b.getContent());
+                    if(isCreateZip == Boolean.TRUE) {
+                        File f = new File(objectPath.toString() + "\\" + newComponents.get(neww).getComponentSHA1()+ ".zip");
+                        if (!f.exists()) {
+                            Blob b = (Blob) newComponents.get(neww).getDirectObject();
+                            createZipFile(objectPath, newComponents.get(neww).getComponentSHA1(), b.getContent());
+                        }
+                    }
                 } else {
                     Folder f = (Folder) newComponents.get(neww).getDirectObject();
 
                     //Folder f = new Folder(newComponents.get(neww).getDirectObject().);
                     createShaAndZipForNewCommit(f, null, isCreateZip, Paths.get(path.toString() + "\\" + newComponents.get(neww).getComponentName()));
-                    createZipFile(objectPath, generateSHA1FromString(f.getFolderContentString()), f.getFolderContentString());
+                    if(isCreateZip == Boolean.TRUE) {
+
+                        createZipFile(objectPath, generateSHA1FromString(f.getFolderContentString()), f.getFolderContentString());
+                    }
                 }
                 this.createdFiles.add(Paths.get(path.toString() + "\\" + newComponents.get(neww).getComponentName()));
                 neww++;
             }
-
         }
     }
+//public void    deleteOldObject(Folder.Component c,int index, boolean isCreateZip, Path path) throws IOException {
+//    if (c.getComponentType().equals(FolderType.Folder)) {
+//        Folder f = (Folder) c.getDirectObject();
+//
+//        createShaAndZipForNewCommit(null, f, isCreateZip, Paths.get(path.toString() + "\\" + c.getComponentName()));
+//    }
+//    this.deletedFiles.add(Paths.get(path.toString() + "\\" + c.getComponentName()));
+//    index++;
+//}
 
     private Folder GenerateFolderFromWC(Path currentPath) {
         File[] allFileComponents = currentPath.toFile().listFiles();
@@ -279,12 +308,6 @@ public class GitManager {
 
     }
 
-    public static void CheckOut() {
-
-
-    }
-
-
     public void createEmptyRepositoryFolders(String repPath, String repName)
             throws ExceptionInInitializerError, IllegalArgumentException {
         if (repPath.substring(repPath.length() - 1) != "/") {
@@ -315,7 +338,7 @@ public class GitManager {
 //            //create origcommit
                 Folder folder = GenerateFolderFromWC(GITRepository.getRepositoryPath());
                 GITRepository.getHeadBranch().getPointedCommit().setOrigCommit(folder);
-                this.userName = "Ädministrator";
+                this.userName = "Administrator";
                 GITRepository.getHeadBranch().getPointedCommit().setOrigCommit(folder);
             } else throw new IllegalArgumentException(); // the wanted name already exist
         } else throw new ExceptionInInitializerError(); // the wanted path doesnt exist
@@ -366,7 +389,7 @@ public class GitManager {
             b.getPointedCommit().setOrigCommit(folder);
             newCommit.setCommitFileContentToSHA();
                 br.close();
-
+GITRepository.getCommitList().put(newCommit.getSHA(),newCommit);
         }
     }
 
@@ -617,9 +640,11 @@ public class GitManager {
                 Blob b = (Blob)c.getDirectObject();
                createFile(c.getComponentName(),b.getContent(),pathForFile);
             } else {
+                new File(pathForFile.toString() + "\\" + c.getComponentName()).mkdirs();
                 Folder f = (Folder)c.getDirectObject();
                 createFilesInWCFromCommitObject(f,Paths.get(pathForFile.toString() + "\\" + c.getComponentName()));
                             }
         }
+
     }
 }

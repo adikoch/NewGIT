@@ -10,11 +10,15 @@ public class Repository {
     private Path path;
     private HashSet<Branch> branches;
     private Branch head;
-    private Map<String, Commit> commitMap = new HashMap<>();
+    private Map<String, Commit> commitMap;
     private String repositoryName;
-    //String repositoryLocation;
+
+
     //String remoteReferenceName;
     //String referenceNameLocation;
+
+
+
     Repository(Path workingPath) {
         path = workingPath;
         branches = new HashSet<>();

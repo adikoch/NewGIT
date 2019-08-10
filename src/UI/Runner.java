@@ -227,6 +227,9 @@ public class Runner {
                 out.println("Deleted Files's Paths:" + manager.getDeletedFile());
                 out.println("Added Files's Paths:" + manager.getCreatedFiles());
                 out.println("Updated Files's Paths:" + manager.getUpdatedFiles());
+                manager.getCreatedFiles().clear();
+                manager.getDeletedFile().clear();
+                manager.getUpdatedFiles().clear();
             } catch (Exception e) {
                 out.println("Show Status Failed! Unable to create files");}
         } else {
@@ -271,8 +274,22 @@ public class Runner {
         Scanner sc= new Scanner(System.in);
         String branchName= sc.nextLine();
         try {
-            manager.executeCheckout(branchName);
-        } catch (Exception e) {
+            manager.ExecuteCommit("", false);
+            if (manager.getDeletedFile().size() != 0 ||
+                    manager.getUpdatedFiles().size() != 0 ||
+                    manager.getCreatedFiles().size() != 0) {
+                out.println("There are unsaved changes in the WC. would you like to save it before checkout?" );
+                String toCommit = sc.nextLine();
+               if(toCommit.equals("yes"))
+                {
+                    manager.ExecuteCommit("commit before checkout to " + sc.toString() + "Branch", true);
+                }
+            }
+                manager.executeCheckout(branchName);
+            manager.getCreatedFiles().clear();
+            manager.getDeletedFile().clear();
+            manager.getUpdatedFiles().clear();
+        }catch (Exception e) {
             e.printStackTrace();
         }
     }
