@@ -64,6 +64,10 @@ public class Commit {
 
     public String getDescription (){ return description;}
 
+    public void setSHAContent(String content)
+    {
+        this.SHAContent=content;
+    }
 
         //methods
     public void setCommitFileContentToSHA() {
