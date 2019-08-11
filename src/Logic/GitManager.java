@@ -60,9 +60,9 @@ public class GitManager {
 
             if (isCreateZip) {
                 Commit c = new Commit(description, userName);
-                String prevprevSHA1 = GITRepository.getHeadBranch().getPointedCommit().getSHA1PreveiousCommit();//האם יש סבא
-                if (prevprevSHA1 != null) {
-                    c.setSHA1PrevPrevCommit(prevprevSHA1);
+                String anotherPrev = GITRepository.getHeadBranch().getPointedCommit().getSHA1PreveiousCommit();//האם יש עוד אבא
+                if (anotherPrev != null) {
+                    c.setSHA1anotherPreveiousCommit(anotherPrev);
                 }
                 GITRepository.getHeadBranch().setPointedCommit(c); //creation
                 ///////////////////////////////////???????

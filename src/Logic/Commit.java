@@ -16,7 +16,7 @@ public class Commit {
     private Folder rootFolder;
     private String rootFolderSHA1;
     private String SHA1PreveiousCommit;
-    private String SHA1PrevPrevCommit;
+    private String SHA1anotherPreveiousCommit;
     private String description;
     private String creationDate;
     private String changer;
@@ -30,7 +30,7 @@ public class Commit {
         creationDate = GitManager.getDate(null);
         changer = "Administrator";
         SHA1PreveiousCommit=null;
-        SHA1PrevPrevCommit=null;
+        SHA1anotherPreveiousCommit=null;
     }
 
     public Commit(String usersDescription, String userName)
@@ -44,7 +44,7 @@ public class Commit {
     {
         rootFolderSHA1 = args.get(0);
           SHA1PreveiousCommit = args.get(1);
-          SHA1PrevPrevCommit = args.get(2);
+        SHA1anotherPreveiousCommit = args.get(2);
           description = args.get(3);
           creationDate = args.get(4);
           changer = args.get(5);
@@ -52,8 +52,8 @@ public class Commit {
 
 
     // getters, setters
-    public String getSHA1PrevPrevCommit() { return SHA1PrevPrevCommit; }
-    public void setSHA1PrevPrevCommit(String SHA1PrevPrevCommit) { this.SHA1PrevPrevCommit = SHA1PrevPrevCommit; }
+    public String getSHA1anotherPreveiousCommit() { return SHA1anotherPreveiousCommit; }
+    public void setSHA1anotherPreveiousCommit(String SHA1PrevPrevCommit) { this.SHA1anotherPreveiousCommit = SHA1PrevPrevCommit; }
 
     public String getRootFolderSHA1() { return rootFolderSHA1; }
     public void setRootFolderSHA1(String rootFolderSHA1) { this.rootFolderSHA1 = rootFolderSHA1; }
@@ -93,7 +93,7 @@ public class Commit {
         s.append(System.lineSeparator());
         s.append(getSHA1PreveiousCommit());
         s.append(System.lineSeparator());
-        s.append(getSHA1PrevPrevCommit());
+        s.append(SHA1anotherPreveiousCommit);
         s.append(System.lineSeparator());
         s.append(description);
         s.append(System.lineSeparator());
