@@ -107,7 +107,11 @@ public class Runner {
     }
 
     private void ShowHistoryOfActiveBranch() {//לא עובד במקרה שעושים סוויץ רפוזטורי
-        manager.ShowHistoryActiveBranch();
+        try{
+            String historyOfActiveBranch= manager.ShowHistoryActiveBranch();
+            out.println(historyOfActiveBranch);
+        }
+        catch(Exception e) {out.println("something went wrong");}
     }
 
     private void UpdateUsername() {
@@ -157,11 +161,11 @@ public class Runner {
             manager.ExecuteCommit(description, true);
         } catch (Exception e) {
             out.println("Commit Failed! Unable to create files");}
-        out.println("Deleted Files's Paths:" + manager.getDeletedFile().toString());
+        out.println("Deleted Files's Paths:" + manager.getDeletedFiles().toString());
         out.println("Added Files's Paths:" + manager.getCreatedFiles().toString());
         out.println("Updated Files's Paths:" + manager.getUpdatedFiles().toString());
         manager.getCreatedFiles().clear();
-        manager.getDeletedFile().clear();
+        manager.getDeletedFiles().clear();
         manager.getUpdatedFiles().clear();
         //CommitsList.add((newCommit));
 
@@ -196,55 +200,33 @@ public class Runner {
         Scanner sc = new Scanner(System.in);
         String repPath= null;
         String repName= null;
+        out.println("Enter the full path for the new repository: ");
 
-        while(repPath==null || !manager.DoesPathExist(repPath))
+        while(repPath==null || !manager.doesPathExist(repPath))
         {
-
+            if(repPath!=null)
+            {
+                out.println("The wanted path does not exist, please try again");
+            }
+            repPath = sc.nextLine();
         }
 
-        while(true) {//does path exist
-            out.println("Enter the full path for the new repository: ");
-            String repPath = sc.nextLine();
-            out.println("Choose name for the new repository: ");
-            String repName = sc.nextLine();
-            try {
-                manager.createEmptyRepositoryFolders(repPath, repName);
-                isValid=true;
-            }
-            catch (IllegalArgumentException e) {
+
+        out.println("Choose a name for the new repository: ");
+        while(repName==null || manager.doesPathExist(repPath+"\\"+repName))
+        {
+            if(repName!=null)
+            {
                 out.println("The wanted name already exist, please try again");
-                isValid=false;}
-            catch (ExceptionInInitializerError er) {
-                out.println("The wanted path does not exist, please try again");
-                isValid=false;}
+            }
+            repName = sc.nextLine();
+        }
+
+        try {manager.createEmptyRepositoryFolders(repPath, repName);}
+        catch(Exception e){
+            out.println("File creation failed, nothing changed");
         }
     }
-
-    /*
-        private void createEmptyRepository() {
-        boolean isValid=false;
-        Scanner sc = new Scanner(System.in);
-
-        while(!isValid) {
-            out.println("Enter the full path for the new repository: ");
-            String repPath = sc.nextLine();
-            out.println("Choose name for the new repository: ");
-            String repName = sc.nextLine();
-            try {
-                manager.createEmptyRepositoryFolders(repPath, repName);
-                isValid=true;
-            }
-            catch (IllegalArgumentException e) {
-                out.println("The wanted name already exist, please try again");
-                isValid=false;}
-            catch (ExceptionInInitializerError er) {
-                out.println("The wanted path does not exist, please try again");
-                isValid=false;}
-        }
-    }
-     */
-
-
 
 
     void ShowStatus() {
@@ -305,7 +287,7 @@ public class Runner {
         String branchName= sc.nextLine();
         try {
             manager.ExecuteCommit("", false);
-            if (manager.getDeletedFile().size() != 0 ||
+            if (manager.getDeletedFiles().size() != 0 ||
                     manager.getUpdatedFiles().size() != 0 ||
                     manager.getCreatedFiles().size() != 0) {
                 out.println("There are unsaved changes in the WC. would you like to save it before checkout?" );
@@ -317,7 +299,7 @@ public class Runner {
             }
                 manager.executeCheckout(branchName);
             manager.getCreatedFiles().clear();
-            manager.getDeletedFile().clear();
+            manager.getDeletedFiles().clear();
             manager.getUpdatedFiles().clear();
         }catch (Exception e) {
             e.printStackTrace();

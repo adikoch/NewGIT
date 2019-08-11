@@ -21,6 +21,8 @@ public class Commit {
         description = "Start The Machine";
         creationDate = GitManager.getDate(null);
         changer = "Administrator";
+        SHA1PreveiousCommit=null;
+        SHA1PrevPrevCommit=null;
     }
 
     public Commit(String usersDescription, String userName)

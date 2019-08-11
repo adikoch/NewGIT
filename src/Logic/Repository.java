@@ -1,10 +1,10 @@
 package Logic;
 
-import Resources.jaxb.MagitRepository;
+//import Resources.jaxb.MagitRepository;
+//import javax.xml.bind.JAXBContext;
+//import javax.xml.bind.JAXBException;
+//import javax.xml.bind.Unmarshaller;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -58,12 +58,12 @@ public class Repository {
 
     Map<String, Commit> getCommitList() { return commitMap; }
 
-    public MagitRepository loadFromXml(String i_XmlPath) throws FileNotFoundException, JAXBException {
-            InputStream inputStream = new FileInputStream(i_XmlPath);
-            JAXBContext jc = JAXBContext.newInstance("Resources.jaxb");
-            Unmarshaller u = jc.createUnmarshaller();
-            return (MagitRepository) u.unmarshal(inputStream);
-    }
+    //public MagitRepository loadFromXml(String i_XmlPath) throws FileNotFoundException, JAXBException {
+     //       InputStream inputStream = new FileInputStream(i_XmlPath);
+       //     JAXBContext jc = JAXBContext.newInstance("Resources.jaxb");
+         //   Unmarshaller u = jc.createUnmarshaller();
+           // return (MagitRepository) u.unmarshal(inputStream);
+    //}
 
     //methods
     void Switch(Path newPath) { path = newPath; }
@@ -95,5 +95,3 @@ public class Repository {
         }
     }
 }
-
-

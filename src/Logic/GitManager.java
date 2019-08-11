@@ -1,5 +1,7 @@
 package Logic;
 
+import org.apache.commons.io.FileUtils;
+
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -61,6 +63,7 @@ public class GitManager {
                     c.setSHA1PrevPrevCommit(prevprevSHA1);
                 }
                 GITRepository.getHeadBranch().setPointedCommit(c); //creation
+                ///////////////////////////////////???????
                 GITRepository.getHeadBranch().getPointedCommit().setSHA1PreveiousCommit(prevCommitSHA1); //setting old commits sha1
                 GITRepository.getHeadBranch().getPointedCommit().setOrigCommit(newFolder); //setting old commit
                 GITRepository.getHeadBranch().getPointedCommit().setRootFolderSHA1(generateSHA1FromString(newFolder.getFolderContentString()));
@@ -282,13 +285,11 @@ public class GitManager {
     }
 
     public void createEmptyRepositoryFolders(String repPath, String repName)
-            throws ExceptionInInitializerError, IllegalArgumentException {
+            throws Exception {
         if (repPath.substring(repPath.length() - 1) != "/") {
             repPath += "\\";
         }
-        if (Files.exists(Paths.get(repPath)))//הpath קיים
-        {
-            if (!Files.exists(Paths.get(repPath + repName))) {
+
                 new File(repPath + repName + "\\.magit\\objects").mkdirs();
                 new File(repPath + repName + "\\.magit\\branches").mkdirs();
                 Path workingPath = Paths.get(repPath + repName + "\\");
@@ -298,12 +299,10 @@ public class GitManager {
                 GITRepository.getHeadBranch().getPointedCommit().setCommitFileContentToSHA();
                 GITRepository.getHeadBranch().setPointedCommitSHA1(GITRepository.getHeadBranch().getPointedCommit().getSHA());
                 //Create commit file
-                try {
-                    createFileInMagit(GITRepository.getHeadBranch().getPointedCommit(), workingPath);//commit
-                    createFileInMagit(GITRepository.getHeadBranch(), workingPath);
-                } catch (Exception e) {
-                    System.out.println("File creation failed");
-                }
+
+                createFileInMagit(GITRepository.getHeadBranch().getPointedCommit(), workingPath);//commit
+                createFileInMagit(GITRepository.getHeadBranch(), workingPath);
+
                 createFile("Head", "Master", Paths.get(repPath + repName + "\\.magit\\branches"));
 
                 GITRepository.getBranchByName("Master").setPointedCommit(GITRepository.getHeadBranch().getPointedCommit());
@@ -313,15 +312,9 @@ public class GitManager {
                 GITRepository.getHeadBranch().getPointedCommit().setOrigCommit(folder);
                 this.userName = "Administrator";
                 GITRepository.getHeadBranch().getPointedCommit().setOrigCommit(folder);
-            } else throw new IllegalArgumentException(); // the wanted name already exist
-        } else throw new ExceptionInInitializerError(); // the wanted path doesnt exist
+
     }
 
-
-    public boolean DoesPathExist(String repPath)
-    {
-        return Files.exists(Paths.get(repPath));
-    }
 
     private boolean isFileMagit(String repPath)
     {
@@ -345,11 +338,19 @@ public class GitManager {
 
 
                 getCommitForBranches(newRepPath);
-            } else throw new ExceptionInInitializerError();//exeption forG not being magit
+            } else throw new ExceptionInInitializerError();//exeption for path not being magit
 
-        } else throw new IllegalArgumentException();//exception for not existing
+        } else throw new IllegalArgumentException();//exception for path not existing
 
     }
+
+
+
+    public boolean doesPathExist(String path)
+    {
+        return Files.exists(Paths.get(path));
+    }
+
 
     /*
         public void switchRepository(Path newRepPath)
@@ -385,7 +386,12 @@ public class GitManager {
             String a;
             int i = 0;
             while ((a = br.readLine()) != null) {
-                st.add(i, a);
+                if(a.equals("null")) {
+                    st.add(i, null);
+                }
+                else {
+                    st.add(i, a);
+                }
                 i++;
             }
             Commit newCommit = new Commit(st);
@@ -529,11 +535,158 @@ GITRepository.getCommitList().put(newCommit.getSHA(),newCommit);
     }
 
 
-    public void ShowHistoryActiveBranch() {
+    public String ShowHistoryActiveBranch() throws Exception{
         String sha1OfMainBranch = GITRepository.getHeadBranch().getPointedCommit().getSHA();
-        ShowHistoryActiveBranchRec(sha1OfMainBranch);
+        return ShowHistoryActiveBranchRec(sha1OfMainBranch);
     }
 
+    /*
+
+    public void ShowHistoryActiveBranchRec(String sha1OfMainBranch) throws IOException {
+        //Commit com = GITRepository.getCommitList().get(sha1OfMainBranch);
+
+        //if (com == null)//null if not inside the list of sha1s
+        //{
+            //need to find it in the folder objects
+
+        //}
+
+        //לי יש את השא1 של הקומיט, רוצה ללכת לקובץ טקסט שלו באובג'קטס, להדפיס אותו (להוסיף לסטרינג שמחזירה), ואז ללכת לקובץ טקסט הזה שוב ולקרוא ממנו מה השא1 של הקומיט פריב, זה בשורה ה2 של הקובץ טקסט
+
+        Path pathOfCommitTextFile= Paths.get(GITRepository.getRepositoryPath()+"\\.magit\\objects"+sha1OfMainBranch);
+        String contentFromTheCommitFile = extractZipFile(pathOfCommitTextFile);//בתוך הסטרינג יש את התוכן של הקובץ טקסט שמתאר את הקומיט
+        System.out.println(contentFromTheCommitFile);
+        File file= new File(pathOfCommitTextFile.toString());
+        String sha1ToReturn= (String) FileUtils.readLines(file).get(0);
+
+        if ()//if prevCommit is null, meaning is first commit ever
+        {
+            return;
+        }
+        System.out.println(com.getSHAContent());// printing the one i got
+        System.out.println(System.lineSeparator());
+        ShowHistoryActiveBranchRec(com.getSHA1PreveiousCommit());
+
+    }
+
+     */
+
+    /*public void ShowHistoryActiveBranchRec(String sha1OfMainBranch) throws IOException {
+        //Commit com = GITRepository.getCommitList().get(sha1OfMainBranch);
+
+        //if (com == null)//null if not inside the list of sha1s
+        //{
+            //need to find it in the folder objects
+
+        //}
+
+        //לי יש את השא1 של הקומיט, רוצה ללכת לקובץ טקסט שלו באובג'קטס, להדפיס אותו (להוסיף לסטרינג שמחזירה), ואז ללכת לקובץ טקסט הזה שוב ולקרוא ממנו מה השא1 של הקומיט פריב, זה בשורה ה2 של הקובץ טקסט
+
+        Path pathOfCommitTextFile= Paths.get(GITRepository.getRepositoryPath()+"\\.magit\\objects"+sha1OfMainBranch);
+        String contentFromTheCommitFile = extractZipFile(pathOfCommitTextFile);//בתוך הסטרינג יש את התוכן של הקובץ טקסט שמתאר את הקומיט
+        System.out.println(contentFromTheCommitFile);
+        File file= new File(pathOfCommitTextFile.toString());
+        String sha1ToReturn= (String) FileUtils.readLines(file).get(0);
+
+        if ()//if prevCommit is null, meaning is first commit ever
+        {
+            return;
+        }
+
+        ShowHistoryActiveBranchRec(com.getSHA1PreveiousCommit());
+
+    }*/
+    //have sha1 of current commit, want to print it and go down to father
+    //check if exist in the list of commits, if exist take the commit from there , print is (append to string)
+    //                                      else take it's zip file, read from it a commit, make it an object of a commit and then send to father
+
+    //exist in the list -- have a father
+    //                  -- dont have a father
+    //does not exist in the list -- have a father
+    //                           -- dont have a father
+
+    public String ShowHistoryActiveBranchRec(String sha1OfMainBranch) throws Exception {
+
+        StringBuilder sb= new StringBuilder();
+        Commit commit= GITRepository.getCommitList().get(sha1OfMainBranch);
+        if(commit==null)
+        {
+            //get commit from the files
+            commit=getCommitFromSha1UsingFiles(GITRepository.getRepositoryPath().toString(), sha1OfMainBranch);
+            //add it to the list of commits (only a part of its fields are there
+            GITRepository.getCommitList().put(sha1OfMainBranch, commit);
+        }
+        //either way now have a commit in my hands
+
+        sb.append(commit.getSHAContent());
+        sb.append(System.lineSeparator());
+        if(commit.getSHA1PrevPrevCommit()==null)//father is difault commit
+            {
+                return sb.toString();
+            }
+        //
+        return sb.toString()+System.lineSeparator()+ShowHistoryActiveBranchRec(commit.getSHA1PreveiousCommit());
+        }
+
+
+
+
+
+
+        public Commit getCommitFromSha1UsingFiles(String path, String sha1) throws Exception{
+
+        //read the file in folder objects that its name is sha1
+            //take all i need to a commit
+            // return it
+            Path commitPath = Paths.get(path.toString() + "\\.magit\\objects\\" + sha1 + ".zip");
+            String commitContent = extractZipFile(commitPath);
+            BufferedReader br = new BufferedReader(new StringReader(commitContent));
+            ArrayList<String> st = new ArrayList<>();
+            String a;
+            int i = 0;
+            while ((a = br.readLine()) != null) {
+                st.add(i, a);
+                i++;
+            }
+            Commit newCommit = new Commit(st);
+
+            return newCommit;
+        }
+
+        /*
+        Commit com = GITRepository.getCommitList().get(sha1OfMainBranch);
+        if(com==null)
+        {
+            //יוצרת את האובייקט קומיט כמו פעם
+            //קוראת רקורסיבית
+        }
+        if(com.getSHA1PreveiousCommit()==null)// commit exist in commit list, no need to open the file
+        {
+            System.out.println(com.getSHAContent());
+            System.out.println(System.lineSeparator());
+
+            Commit c= new Commit();
+            c.setCommitFileContentToSHA();
+            if(com.getSHA1PreveiousCommit()==generateSHA1FromString(c.getSHA()));//my father does not exist
+            {
+                ShowHistoryActiveBranchRec(com.getSHA1PreveiousCommit());
+            }
+        }
+        //commit does not exist in list, need to get it from objects
+
+        if()//תנאי עצירה, לא נמצא בתוך הליסט וגם הקומיט הראשון אי פעם
+        {
+            //להדפיס אותו ולצאת
+        }
+
+        //לא נמצא בתוך הליסט וגם לא הקומיט הראשון
+
+
+
+
+    }
+*/
+    /*
     public void ShowHistoryActiveBranchRec(String sha1OfMainBranch) {
         Commit com = GITRepository.getCommitList().get(sha1OfMainBranch);
         if (com == null)// if first commit ever
@@ -545,7 +698,7 @@ GITRepository.getCommitList().put(newCommit.getSHA(),newCommit);
         ShowHistoryActiveBranchRec(com.getSHA1PreveiousCommit());
 
     }
-
+     */
 
     public static String readTextFile(String filePath) {
         String returnValue = "";
@@ -681,6 +834,7 @@ GITRepository.getCommitList().put(newCommit.getSHA(),newCommit);
         return builder.toString();
 
     }
+
 
 //    public static File getFileFromSHA1(String ShA1, Path path) {
 //        Path objectsPath = Paths.get(path.toString() + "\\objects");
