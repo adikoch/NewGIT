@@ -16,6 +16,8 @@ import java.util.*;
 public class Repository {
 //members
     private Path path;
+
+
     private HashSet<Branch> branches;
     private Branch head;
     private Map<String, Commit> commitMap;
@@ -45,6 +47,10 @@ public class Repository {
     }
 
     //get\set
+
+
+    public void setBranches(HashSet<Branch> branches) { this.branches = branches; }
+
     public String getRepositoryName() { return repositoryName; }
 
     public Path getRepositoryPath() { return path; }
@@ -58,9 +64,9 @@ public class Repository {
 
     Map<String, Commit> getCommitList() { return commitMap; }
 
-    public MagitRepository loadFromXml(String i_XmlPath) throws FileNotFoundException, JAXBException {
+    public static MagitRepository loadFromXml(String i_XmlPath) throws FileNotFoundException, JAXBException {
             InputStream inputStream = new FileInputStream(i_XmlPath);
-            JAXBContext jc = JAXBContext.newInstance("Resources.jaxb");
+            JAXBContext jc = JAXBContext.newInstance("jaxb.schema.generated");
             Unmarshaller u = jc.createUnmarshaller();
             return (MagitRepository) u.unmarshal(inputStream);
     }
@@ -98,6 +104,15 @@ public class Repository {
                     this.branches.add(new Branch(f.getName(), fileContent));
                 }
             }
+        }
+    }
+    public void addCommitsToRepositoryMAp(Map<String, Commit> commitList)//add all commit to comitmap in repository
+    {
+        Iterator entries = commitList.entrySet().iterator();
+        while (entries.hasNext()) {
+            Map.Entry thisEntry = (Map.Entry) entries.next();
+            Commit c = (Commit)thisEntry.getValue();
+            commitMap.put(c.getSHA(),c);
         }
     }
 }

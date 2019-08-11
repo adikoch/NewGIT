@@ -1,8 +1,11 @@
 package Logic;
 
 import jaxb.schema.generated.MagitBranches;
+import jaxb.schema.generated.MagitCommits;
+import jaxb.schema.generated.MagitSingleBranch;
+import jaxb.schema.generated.MagitSingleCommit;
 
-import java.util.Map;
+import java.util.*;
 
 public class Branch {
 
@@ -38,9 +41,16 @@ public class Branch {
 
 
     //methods
-    public static Map<String, Folder.Component> getAllBranchesToMap(MagitBranches branches)
+    public static HashSet<Branch> getAllBranchesToMap(MagitBranches branches, Map<String, Commit> commits)
     {
-
-
+        HashSet<Branch> newbranches = new HashSet<>();
+        List<MagitSingleBranch> brancheslist = branches.getMagitSingleBranch();
+        for(MagitSingleBranch c: brancheslist)
+        {
+            Branch b = new Branch(c.getName());
+            b.setPointedCommit(commits.get(c.getPointedCommit().getId()));
+            newbranches.add(b);
+        }
+        return newbranches;
     }
 }

@@ -109,14 +109,15 @@ public class Commit {
             ArrayList<String> args = new ArrayList<>();
             String rootFolderID = c.getRootFolder().getId();
             String rootFolderSHA1 = folderList.get(rootFolderID).getFolderSHA1();
-            args.set(0,rootFolderSHA1);
-            args.set(1,null);
-            args.set(2,null);
-            args.set(3,c.getMessage());
-            args.set(4,c.getDateOfCreation());
-            args.set(5,c.getAuthor());
+            args.add(0,rootFolderSHA1);
+            args.add(1,null);
+            args.add(2,null);
+            args.add(3,c.getMessage());
+            args.add(4,c.getDateOfCreation());
+            args.add(5,c.getAuthor());
             Commit newcommit = new Commit(args);
             newMap.put(c.getId(),newcommit);
+            newcommit.setRootFolder((Folder)folderList.get(rootFolderID).getDirectObject());
         }
         return newMap;
     }

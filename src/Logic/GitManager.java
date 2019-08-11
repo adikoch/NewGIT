@@ -1,9 +1,6 @@
 package Logic;
 
-import jaxb.schema.generated.MagitCommits;
-import jaxb.schema.generated.MagitRepository;
-import jaxb.schema.generated.MagitSingleCommit;
-import jaxb.schema.generated.MagitSingleFolder;
+import jaxb.schema.generated.*;
 
 import javax.xml.bind.JAXBException;
 import java.io.*;
@@ -83,7 +80,7 @@ public class GitManager {
                 }
                 GITRepository.getHeadBranch().setPointedCommit(c); //creation
                 GITRepository.getHeadBranch().getPointedCommit().setSHA1PreveiousCommit(prevCommitSHA1); //setting old commits sha1
-                GITRepository.getHeadBranch().getPointedCommit().setOrigCommit(newFolder); //setting old commit
+                GITRepository.getHeadBranch().getPointedCommit().setRootFolder(newFolder); //setting old commit
                 GITRepository.getHeadBranch().getPointedCommit().setRootFolderSHA1(generateSHA1FromString(newFolder.getFolderContentString()));
                 GITRepository.getHeadBranch().getPointedCommit().setCommitFileContentToSHA(); //
                 GITRepository.getCommitList().put(GITRepository.getHeadBranch().getPointedCommit().getSHA(), GITRepository.getHeadBranch().getPointedCommit()); //adding to commits list of the current reposetory
@@ -331,9 +328,9 @@ public class GitManager {
 
 //            //create origcommit
                 Folder folder = GenerateFolderFromWC(GITRepository.getRepositoryPath());
-                GITRepository.getHeadBranch().getPointedCommit().setOrigCommit(folder);
+                GITRepository.getHeadBranch().getPointedCommit().setRootFolder(folder);
                 this.userName = "Administrator";
-                GITRepository.getHeadBranch().getPointedCommit().setOrigCommit(folder);
+                GITRepository.getHeadBranch().getPointedCommit().setRootFolder(folder);
             } else throw new IllegalArgumentException(); // the wanted name already exist
         } else throw new ExceptionInInitializerError(); // the wanted path doesnt exist
     }
@@ -413,7 +410,7 @@ public class GitManager {
             //GITRepository.getRepositoryName() = ךהחליף שם של רפוסיטורי
             //לא יצרנו קומיט שההד יצביע עליו כי אין צורך
             Folder folder = generateFolderFromCommitObject(newCommit.getRootFolderSHA1());
-            b.getPointedCommit().setOrigCommit(folder);
+            b.getPointedCommit().setRootFolder(folder);
             newCommit.setCommitFileContentToSHA();
             br.close();
             GITRepository.getCommitList().put(newCommit.getSHA(), newCommit);
@@ -650,7 +647,7 @@ public class GitManager {
         mainFile.delete();
     }
 
-    public void createFilesInWCFromCommitObject(Folder rootFolder, Path pathForFile) throws Exception {
+    public void createFilesInWCFromCommitObject(Folder rootFolder, Path pathForFile) {
         //
         for (Folder.Component c : rootFolder.getComponents()) {
 
@@ -720,53 +717,71 @@ public class GitManager {
 //    }
 
     public void ImportRepositoryFromXML(String xmlPath) throws FileNotFoundException, JAXBException {
-      MagitRepository oldRepository=  GITRepository.loadFromXml(xmlPath);
-      convertOldRepoToNew(oldRepository);
-    }
-public void convertOldRepoToNew(MagitRepository oldRepository)
-{
-    GITRepository.insertMembersToNewRepository(oldRepository);
-    Map<String,Folder.Component> blobList = Folder.getAllBlobsToMap(oldRepository.getMagitBlobs());
-    Map<String,Folder.Component> folderList = Folder.getAllFoldersToMap(oldRepository.getMagitFolders());
-
-    Folder.createListOfComponents(folderList,blobList,oldRepository.getMagitFolders());//create list of component to each folder
-
-   setSHA1ToFolders(folderList);
-    Map<String, Commit> commitList = Commit.getAllCommitsToMap(oldRepository.getMagitCommits(),folderList);
-    updatePrevSHA1(commitList,oldRepository.getMagitCommits());//update prev and prevprev
-    //add all commit to comitmap in repository
-    Map<String,Folder.Component> branchesList = Branch.getAllBranchesToMap(oldRepository.getMagitBranches());
-    //add all branched to branches list in repository
-
-
-}
-public void updatePrevSHA1(Map<String, Commit> commitList, MagitCommits oldList)//update prev and prevprev
-{
-    List<MagitSingleCommit> oldlist = folders.getMagitSingleFolder();
-    for (MagitSingleCommit f : oldlist) {
-        String prevID = f.getPrecedingCommits().getPrecedingCommit().get(0).getId();
-        String prevPrevID = f.getPrecedingCommits().getPrecedingCommit().get(1).getId();
-        commitList.get(f.getId()).setSHA1PreveiousCommit(commitList.get(prevID).getSHA());
-        commitList.get(f.getId()).setSHA1PrevPrevCommit(commitList.get(prevPrevID).getSHA());
-
+        MagitRepository oldRepository = Repository.loadFromXml(xmlPath);
+        GITRepository = new Repository(Paths.get(oldRepository.getLocation()));
+        convertOldRepoToNew(oldRepository);
+        createFilesInWCFromCommitObject(GITRepository.getHeadBranch().getPointedCommit().getRootFolder(), GITRepository.getRepositoryPath());
 
     }
-//    Iterator entries = commitList.entrySet().iterator();
-//    while (entries.hasNext()) {
-//        Map.Entry thisEntry = (Map.Entry) entries.next();
-//
-//
-//        Folder f = (Folder)c.getDirectObject();
-//        c.setSha1(generateSHA1FromString(f.getFolderContentString()));
+
+    public void convertOldRepoToNew(MagitRepository oldRepository) {
+        GITRepository.insertMembersToNewRepository(oldRepository);
+        Map<String, Folder.Component> blobList = Folder.getAllBlobsToMap(oldRepository.getMagitBlobs());
+        Map<String, Folder.Component> folderList = Folder.getAllFoldersToMap(oldRepository.getMagitFolders());
+
+        Folder.createListOfComponents(folderList, blobList, oldRepository.getMagitFolders());//create list of component to each folder
+        setSHA1ToFolders(folderList);
+
+        Map<String, Commit> commitList = Commit.getAllCommitsToMap(oldRepository.getMagitCommits(), folderList);
+        updateAllSHA1(commitList, oldRepository.getMagitCommits());//update prev and prevprev and cur SHA1
+        GITRepository.addCommitsToRepositoryMAp(commitList);//add all commit to comitmap in repository
+
+        GITRepository.setBranches(Branch.getAllBranchesToMap(oldRepository.getMagitBranches(), commitList));    //add all branched to branches list in repository
+
+        GITRepository.setHeadBranch(GITRepository.getBranchByName(oldRepository.getMagitBranches().getHead()));//set head
     }
-}
-    public  static void setSHA1ToFolders( Map<String, Folder.Component> folderList)
+
+    public void updateAllSHA1(Map<String, Commit> commitList, MagitCommits oldList)//update prev and prevprev
     {
+        List<MagitSingleCommit> oldlist = oldList.getMagitSingleCommit();
+        for (MagitSingleCommit c : oldlist) {
+            //PrecedingCommits.PrecedingCommit p =  c.getPrecedingCommits().getPrecedingCommit().get(0);
+            updateCurrentSHA(commitList, c, oldList);
+//            String prevID = f.getPrecedingCommits().getPrecedingCommit().get(0).getId();
+//            String prevPrevID = f.getPrecedingCommits().getPrecedingCommit().get(1).getId();
+//            commitList.get(f.getId()).setSHA1PreveiousCommit(commitList.get(prevID).getSHA());
+//            commitList.get(f.getId()).setSHA1PrevPrevCommit(commitList.get(prevPrevID).getSHA());
+        }
+    }
+
+    public void updateCurrentSHA(Map<String, Commit> commitList, MagitSingleCommit c, MagitCommits oldList) {
+        if (c.getPrecedingCommits() == null || (commitList.get(c.getPrecedingCommits().getPrecedingCommit().get(0).getId()).getSHA1PreveiousCommit() != null
+        && commitList.get(c.getPrecedingCommits().getPrecedingCommit().get(0).getId()).getSHA1PrevPrevCommit() != null))
+        {
+            commitList.get(c.getId()).setCommitFileContentToSHA();
+            return;
+        }
+        MagitSingleCommit commit = getMagitCommit(c.getPrecedingCommits().getPrecedingCommit().get(0).getId(), oldList);
+        //commitList.get(c.getPrecedingCommits().getPrecedingCommit().get(0));
+        updateCurrentSHA(commitList, commit, oldList);
+    }
+
+    public MagitSingleCommit getMagitCommit(String ID, MagitCommits oldList) {
+        List<MagitSingleCommit> oldlist = oldList.getMagitSingleCommit();
+        for (MagitSingleCommit c : oldlist) {
+            if (c.getId().equals(ID)) {
+                return c;
+            }
+        }
+        return null;
+    }
+
+    public static void setSHA1ToFolders(Map<String, Folder.Component> folderList) {
         Iterator entries = folderList.entrySet().iterator();
         while (entries.hasNext()) {
             Map.Entry thisEntry = (Map.Entry) entries.next();
-            Folder.Component c =(Folder.Component)thisEntry;
-            Folder f = (Folder)c.getDirectObject();
+            Folder.Component c = (Folder.Component) thisEntry.getValue();
+            Folder f = (Folder) c.getDirectObject();
             c.setSha1(generateSHA1FromString(f.getFolderContentString()));
         }
 

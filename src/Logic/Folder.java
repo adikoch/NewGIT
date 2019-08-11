@@ -193,13 +193,13 @@ public class Folder implements FileObject{
             Folder folder = new Folder();
             folder.components = new ArrayList<>();
             for (Item i : f.getItems().getItem()) {
-                if (i.getType().equals("Folder")) {
+                if (i.getType().equals("folder")) {
                     folder.components.add(folderList.get(i.getId()));
                 } else {
                     folder.components.add(blobList.get(i.getId()));
                 }
             }
-            folderList.get(f.getId()).setDirectObject(new Folder());
+            folderList.get(f.getId()).setDirectObject(folder);
         }
     }
 

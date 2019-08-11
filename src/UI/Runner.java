@@ -4,6 +4,8 @@ import Logic.GitManager;
 //import org.graalvm.compiler.core.CompilationWrapper;
 
 
+import javax.xml.bind.JAXBException;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Path;
@@ -337,7 +339,13 @@ public class Runner {
         out.println("Please enter the path of the xml file to import");
         Scanner sc= new Scanner(System.in);
         String xmlPath= sc.nextLine();
-        manager.ImportRepositoryFromXML(xmlPath);
+        try {
+            manager.ImportRepositoryFromXML(xmlPath);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (JAXBException e) {
+            e.printStackTrace();
+        }
     }
 
 
