@@ -18,9 +18,6 @@ public class Commit {
     private String SHA1PreveiousCommit;
     private String SHA1PrevPrevCommit;
     private String description;
-
-
-
     private String creationDate;
     private String changer;
     private String SHAContent;
@@ -32,6 +29,8 @@ public class Commit {
         description = "Start The Machine";
         creationDate = GitManager.getDate(null);
         changer = "Administrator";
+        SHA1PreveiousCommit=null;
+        SHA1PrevPrevCommit=null;
     }
 
     public Commit(String usersDescription, String userName)
@@ -76,6 +75,10 @@ public class Commit {
     public void setDescription (String descriptionFromUser){ description =  descriptionFromUser; }
 
     public void setCreationDate(String creationDate) { this.creationDate = creationDate; }
+    public void setSHAContent(String content)
+    {
+        this.SHAContent=content;
+    }
 
         //methods
     public void setCommitFileContentToSHA() {

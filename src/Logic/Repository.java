@@ -16,8 +16,6 @@ import java.util.*;
 public class Repository {
 //members
     private Path path;
-
-
     private HashSet<Branch> branches;
     private Branch head;
     private Map<String, Commit> commitMap;

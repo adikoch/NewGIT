@@ -96,7 +96,7 @@ public class Runner {
                 break;
 
             case (12):
-                //createEmptyRepository();//validation V
+                createEmptyRepository();//validation V
                 break;
 
             case (13):
@@ -109,7 +109,11 @@ public class Runner {
     }
 
     private void ShowHistoryOfActiveBranch() {//לא עובד במקרה שעושים סוויץ רפוזטורי
-        manager.ShowHistoryActiveBranch();
+        try{
+            String historyOfActiveBranch= manager.ShowHistoryActiveBranch();
+            out.println(historyOfActiveBranch);
+        }
+        catch(Exception e) {out.println("something went wrong");}
     }
 
     private void UpdateUsername() {
@@ -193,60 +197,38 @@ public class Runner {
         manager.CreatBranch(newBranchName);
     }
 
-//    private void createEmptyRepository() {
-//        boolean isValid=false;
-//        Scanner sc = new Scanner(System.in);
-//        String repPath= null;
-//        String repName= null;
-//
-//        while(repPath==null || !manager.DoesPathExist(repPath))
-//        {
-//
-//        }
-//
-//        while(true) {//does path exist
-//            out.println("Enter the full path for the new repository: ");
-//            String repPath = sc.nextLine();
-//            out.println("Choose name for the new repository: ");
-//            String repName = sc.nextLine();
-//            try {
-//                manager.createEmptyRepositoryFolders(repPath, repName);
-//                isValid=true;
-//            }
-//            catch (IllegalArgumentException e) {
-//                out.println("The wanted name already exist, please try again");
-//                isValid=false;}
-//            catch (ExceptionInInitializerError er) {
-//                out.println("The wanted path does not exist, please try again");
-//                isValid=false;}
-//        }
-//    }
-
-    /*
-        private void createEmptyRepository() {
+    private void createEmptyRepository() {
         boolean isValid=false;
         Scanner sc = new Scanner(System.in);
+        String repPath= null;
+        String repName= null;
+        out.println("Enter the full path for the new repository: ");
 
-        while(!isValid) {
-            out.println("Enter the full path for the new repository: ");
-            String repPath = sc.nextLine();
-            out.println("Choose name for the new repository: ");
-            String repName = sc.nextLine();
-            try {
-                manager.createEmptyRepositoryFolders(repPath, repName);
-                isValid=true;
-            }
-            catch (IllegalArgumentException e) {
-                out.println("The wanted name already exist, please try again");
-                isValid=false;}
-            catch (ExceptionInInitializerError er) {
+        while(repPath==null || !manager.doesPathExist(repPath))
+        {
+            if(repPath!=null)
+            {
                 out.println("The wanted path does not exist, please try again");
-                isValid=false;}
+            }
+            repPath = sc.nextLine();
+        }
+
+
+        out.println("Choose a name for the new repository: ");
+        while(repName==null || manager.doesPathExist(repPath+"\\"+repName))
+        {
+            if(repName!=null)
+            {
+                out.println("The wanted name already exist, please try again");
+            }
+            repName = sc.nextLine();
+        }
+
+        try {manager.createEmptyRepositoryFolders(repPath, repName);}
+        catch(Exception e){
+            out.println("File creation failed, nothing changed");
         }
     }
-     */
-
-
 
 
     void ShowStatus() {
