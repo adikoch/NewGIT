@@ -2,9 +2,6 @@ package Logic;
 
 import jaxb.schema.generated.*;
 
-import javax.xml.bind.JAXBException;
-import org.apache.commons.io.FileUtils;
-
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -27,23 +24,42 @@ public class GitManager {
     private LinkedList<Path> createdFiles = new LinkedList<>();
     private LinkedList<Path> deletedFiles = new LinkedList<>();
     // }
-
-//get\set
-    public LinkedList<Path> getUpdatedFiles() { return updatedFiles; }
-    public LinkedList<Path> getCreatedFiles() { return createdFiles; }
-    public LinkedList<Path> getDeletedFiles() { return deletedFiles; }
-
-    public Repository getGITRepository() { return GITRepository; }
-
-    public String getUserName() { return userName; }
-    public void updateNewUserNameInLogic(String NewUserName) { userName = NewUserName; }
-
-    static String generateSHA1FromString(String str) { return org.apache.commons.codec.digest.DigestUtils.sha1Hex(str); }
+    Map<String,Commit> commitMap;
+    Map<String, Folder.Component> folderMap;
+    Map<String, Folder.Component> blobMap;
 
 
+    //get\set
+    public LinkedList<Path> getUpdatedFiles() {
+        return updatedFiles;
+    }
+
+    public LinkedList<Path> getCreatedFiles() {
+        return createdFiles;
+    }
+
+    public LinkedList<Path> getDeletedFiles() {
+        return deletedFiles;
+    }
+
+    public Repository getGITRepository() {
+        return GITRepository;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void updateNewUserNameInLogic(String NewUserName) {
+        userName = NewUserName;
+    }
+
+    static String generateSHA1FromString(String str) {
+        return org.apache.commons.codec.digest.DigestUtils.sha1Hex(str);
+    }
 
 
-//methods
+    //methods
     public void ExecuteCommit(String description, Boolean isCreateZip) throws Exception {
         Path ObjectPath = Paths.get(GITRepository.getRepositoryPath().toString() + "\\.magit\\Objects");
         Path BranchesPath = Paths.get(GITRepository.getRepositoryPath().toString() + "\\.magit\\Branches");
@@ -109,14 +125,14 @@ public class GitManager {
                                 Folder oldf = (Folder) oldComponents.get(oldd).getDirectObject();
 
                                 createShaAndZipForNewCommit(newf, oldf, isCreateZip, Paths.get(path.toString() + "\\" + oldComponents.get(oldd).getComponentName()));
-                                if(isCreateZip == Boolean.TRUE) {
+                                if (isCreateZip == Boolean.TRUE) {
                                     createZipFile(objectPath, generateSHA1FromString(newf.getFolderContentString()), newf.getFolderContentString());
                                 }
                                 neww++;
                                 oldd++;
                             } else {
                                 //both blob - updated
-                                if(isCreateZip == Boolean.TRUE) {
+                                if (isCreateZip == Boolean.TRUE) {
                                     File f = new File(objectPath.toString() + "\\" + newComponents.get(neww).getComponentSHA1() + ".zip");
                                     if (!f.exists()) {
                                         Blob b = (Blob) newComponents.get(neww).getDirectObject();
@@ -291,13 +307,13 @@ public class GitManager {
 
         createFile("Head", "Master", Paths.get(repPath + repName + "\\.magit\\branches"));
 
-                GITRepository.getBranchByName("Master").setPointedCommit(GITRepository.getHeadBranch().getPointedCommit());
+        GITRepository.getBranchByName("Master").setPointedCommit(GITRepository.getHeadBranch().getPointedCommit());
 
 //            //create origcommit
-                Folder folder = GenerateFolderFromWC(GITRepository.getRepositoryPath());
-                GITRepository.getHeadBranch().getPointedCommit().setRootFolder(folder);
-                this.userName = "Administrator";
-                GITRepository.getHeadBranch().getPointedCommit().setRootFolder(folder);
+        Folder folder = GenerateFolderFromWC(GITRepository.getRepositoryPath());
+        GITRepository.getHeadBranch().getPointedCommit().setRootFolder(folder);
+        this.userName = "Administrator";
+        GITRepository.getHeadBranch().getPointedCommit().setRootFolder(folder);
     }
 
 
@@ -443,8 +459,9 @@ public class GitManager {
                 out.append(System.lineSeparator());
             }
         } catch (IOException e) {
-            e.printStackTrace();//ענביתתתתתתתתתתתתת
+            e.printStackTrace();
         } finally {
+
             reader.close();
         }
         return out;
@@ -512,7 +529,7 @@ public class GitManager {
 
         sb.append(commit.getSHAContent());
         sb.append(System.lineSeparator());
-        if (commit.getSHA1PrevPrevCommit() == null)//father is difault commit
+        if (commit.getSHA1anotherPreveiousCommit() == null)//father is difault commit
         {
             return sb.toString();
         }
@@ -711,7 +728,7 @@ public class GitManager {
 //
 //    }
 
-    public void ImportRepositoryFromXML(String xmlPath) throws FileNotFoundException, JAXBException {
+    public void ImportRepositoryFromXML(String xmlPath) throws Exception {
         MagitRepository oldRepository = Repository.loadFromXml(xmlPath);
         GITRepository = new Repository(Paths.get(oldRepository.getLocation()));
         convertOldRepoToNew(oldRepository);
@@ -719,46 +736,48 @@ public class GitManager {
 
     }
 
-    public void convertOldRepoToNew(MagitRepository oldRepository) {
+    public void convertOldRepoToNew(MagitRepository oldRepository) throws Exception{
+
+        checkValidation(oldRepository);
         GITRepository.insertMembersToNewRepository(oldRepository);
-        Map<String, Folder.Component> blobList = Folder.getAllBlobsToMap(oldRepository.getMagitBlobs());
-        Map<String, Folder.Component> folderList = Folder.getAllFoldersToMap(oldRepository.getMagitFolders());
+        blobMap = Folder.getAllBlobsToMap(oldRepository.getMagitBlobs());
+        folderMap = Folder.getAllFoldersToMap(oldRepository.getMagitFolders());
 
-        Folder.createListOfComponents(folderList, blobList, oldRepository.getMagitFolders());//create list of component to each folder
-        setSHA1ToFolders(folderList);
+        Folder.createListOfComponents(folderMap, blobMap, oldRepository.getMagitFolders());//create list of component to each folder
+        setSHA1ToFolders();
 
-        Map<String, Commit> commitList = Commit.getAllCommitsToMap(oldRepository.getMagitCommits(), folderList);
-        updateAllSHA1(commitList, oldRepository.getMagitCommits());//update prev and prevprev and cur SHA1
-        GITRepository.addCommitsToRepositoryMAp(commitList);//add all commit to comitmap in repository
+        commitMap = Commit.getAllCommitsToMap(oldRepository.getMagitCommits(), folderMap);
+        updateAllSHA1(oldRepository.getMagitCommits());//update prev and prevprev and cur SHA1
+        GITRepository.addCommitsToRepositoryMAp(commitMap);//add all commit to comitmap in repository
 
-        GITRepository.setBranches(Branch.getAllBranchesToMap(oldRepository.getMagitBranches(), commitList));    //add all branched to branches list in repository
+        GITRepository.setBranches(Branch.getAllBranchesToMap(oldRepository.getMagitBranches(), commitMap));    //add all branched to branches list in repository
 
         GITRepository.setHeadBranch(GITRepository.getBranchByName(oldRepository.getMagitBranches().getHead()));//set head
+        createMagitFiles();
+
     }
 
-    public void updateAllSHA1(Map<String, Commit> commitList, MagitCommits oldList)//update prev and prevprev
+    public void updateAllSHA1(MagitCommits oldList)//update prev and prevprev
     {
         List<MagitSingleCommit> oldlist = oldList.getMagitSingleCommit();
         for (MagitSingleCommit c : oldlist) {
-            //PrecedingCommits.PrecedingCommit p =  c.getPrecedingCommits().getPrecedingCommit().get(0);
-            updateCurrentSHA(commitList, c, oldList);
-//            String prevID = f.getPrecedingCommits().getPrecedingCommit().get(0).getId();
-//            String prevPrevID = f.getPrecedingCommits().getPrecedingCommit().get(1).getId();
-//            commitList.get(f.getId()).setSHA1PreveiousCommit(commitList.get(prevID).getSHA());
-//            commitList.get(f.getId()).setSHA1PrevPrevCommit(commitList.get(prevPrevID).getSHA());
+            updateCurrentSHA(c, oldList);
         }
     }
 
-    public void updateCurrentSHA(Map<String, Commit> commitList, MagitSingleCommit c, MagitCommits oldList) {
-        if (c.getPrecedingCommits() == null || (commitList.get(c.getPrecedingCommits().getPrecedingCommit().get(0).getId()).getSHA1PreveiousCommit() != null
-        && commitList.get(c.getPrecedingCommits().getPrecedingCommit().get(0).getId()).getSHA1PrevPrevCommit() != null))
+    public void updateCurrentSHA(MagitSingleCommit c, MagitCommits oldList) {
+        if (c.getPrecedingCommits() == null || (commitMap.get(c.getPrecedingCommits().getPrecedingCommit().get(0).getId()).getSHA() != null))
+        //&& commitList.get(c.getPrecedingCommits().getPrecedingCommit().get(0).getId()).getSHA1anotherPreveiousCommit() != null))
         {
-            commitList.get(c.getId()).setCommitFileContentToSHA();
+            commitMap.get(c.getId()).setCommitFileContentToSHA();
+            if (c.getPrecedingCommits() != null) {
+                commitMap.get((c.getId())).setSHA1PreveiousCommit(commitMap.get(c.getPrecedingCommits().getPrecedingCommit().get(0).getId()).getSHA());
+            }
             return;
         }
         MagitSingleCommit commit = getMagitCommit(c.getPrecedingCommits().getPrecedingCommit().get(0).getId(), oldList);
         //commitList.get(c.getPrecedingCommits().getPrecedingCommit().get(0));
-        updateCurrentSHA(commitList, commit, oldList);
+        updateCurrentSHA(commit, oldList);
     }
 
     public MagitSingleCommit getMagitCommit(String ID, MagitCommits oldList) {
@@ -771,14 +790,107 @@ public class GitManager {
         return null;
     }
 
-    public static void setSHA1ToFolders(Map<String, Folder.Component> folderList) {
-        Iterator entries = folderList.entrySet().iterator();
+    public void setSHA1ToFolders() {
+        Iterator entries = folderMap.entrySet().iterator();
         while (entries.hasNext()) {
             Map.Entry thisEntry = (Map.Entry) entries.next();
             Folder.Component c = (Folder.Component) thisEntry.getValue();
             Folder f = (Folder) c.getDirectObject();
             c.setSha1(generateSHA1FromString(f.getFolderContentString()));
         }
+
+    }
+
+    public void createMagitFiles() throws Exception {
+        new File(GITRepository.getRepositoryPath() + "\\.magit\\objects").mkdirs();
+        new File(GITRepository.getRepositoryPath() + "\\.magit\\branches").mkdirs();
+
+        createBranchesFiles();
+        createObjectFiles();
+    }
+
+    public void createBranchesFiles() throws Exception {
+        Path BranchesPath = Paths.get(GITRepository.getRepositoryPath().toString() + "\\.magit\\Objects");
+        for (Branch b : GITRepository.getBranches()) {
+            createFileInMagit(b, GITRepository.getRepositoryPath());
+        }
+        createFile("Head", GITRepository.getHeadBranch().getBranchName(), BranchesPath);
+    }
+
+    public void createObjectFiles() throws Exception{
+        createBlobs();
+        createFolders();
+        createCommits();
+    }
+
+    public void createBlobs() throws Exception {
+        Path ObjectPath = Paths.get(GITRepository.getRepositoryPath().toString() + "\\.magit\\Objects");
+
+        Iterator entries = blobMap.entrySet().iterator();
+        while (entries.hasNext()) {
+            Map.Entry thisEntry = (Map.Entry) entries.next();
+            Folder.Component c = (Folder.Component) thisEntry.getValue();
+            Blob b = (Blob) c.getDirectObject();
+            createFileInMagit(b,ObjectPath);
+        }
+
+    }
+
+    public void createFolders() throws Exception {
+        Path ObjectPath = Paths.get(GITRepository.getRepositoryPath().toString() + "\\.magit\\Objects");
+
+        Iterator entries = folderMap.entrySet().iterator();
+        while (entries.hasNext()) {
+            Map.Entry thisEntry = (Map.Entry) entries.next();
+            Folder.Component c = (Folder.Component) thisEntry.getValue();
+            Folder f = (Folder) c.getDirectObject();
+            createFileInMagit(f, ObjectPath);
+        }
+    }
+
+    public void createCommits() throws Exception {
+        Path ObjectPath = Paths.get(GITRepository.getRepositoryPath().toString() + "\\.magit\\Objects");
+
+        Iterator entries = commitMap.entrySet().iterator();
+        while (entries.hasNext()) {
+            Map.Entry thisEntry = (Map.Entry) entries.next();
+            Commit c = (Commit) thisEntry.getValue();
+            createFileInMagit(c,ObjectPath);
+        }
+    }
+    public void checkValidation(MagitRepository oldRepository)
+    {
+        isFileXML();//1
+        isTwoIdentifiedID();//2
+        isBlobOrFolderRelateToFolder();//3+4+5
+        isRootFolder();//6
+        isBranchCommitExist();//7
+        isHeadBranchExist();//8
+
+
+    }
+    public void isFileXML()//1
+    {
+
+    }
+    public void isTwoIdentifiedID()//2
+    {
+
+    }
+    public void  isBlobOrFolderRelateToFolder()//3+4+5
+    {
+
+    }
+    public void isRootFolder()//6
+    {
+
+    }
+    public void  isBranchCommitExist()//7
+    {
+
+    }
+    public void isHeadBranchExist()//8
+    {
 
     }
 }

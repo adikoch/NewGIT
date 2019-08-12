@@ -1,9 +1,7 @@
 package Logic;
 
 import jaxb.schema.generated.MagitBranches;
-import jaxb.schema.generated.MagitCommits;
 import jaxb.schema.generated.MagitSingleBranch;
-import jaxb.schema.generated.MagitSingleCommit;
 
 import java.util.*;
 

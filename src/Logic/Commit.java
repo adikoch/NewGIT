@@ -1,9 +1,7 @@
 package Logic;
 
 import jaxb.schema.generated.MagitCommits;
-import jaxb.schema.generated.MagitFolders;
 import jaxb.schema.generated.MagitSingleCommit;
-import jaxb.schema.generated.MagitSingleFolder;
 
 import java.util.ArrayList;
 import java.util.HashMap;
