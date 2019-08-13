@@ -6,11 +6,14 @@ import jaxb.schema.generated.*;
 import java.io.*;
 import java.util.*;
 
-public class Folder implements FileObject{
+public class Folder implements FileObject {
 
     //members
     private ArrayList<Component> components;
 
+
+
+    private  boolean isRoot;
     //con
 //    Folder(Component c)
 //    {
@@ -22,10 +25,9 @@ public class Folder implements FileObject{
     }
 
 
-    protected static class Component implements Comparable<Component> , FileObject{
+    protected static class Component implements Comparable<Component>, FileObject {
         //members
         private FolderType type;
-
 
 
         private String Sha1;
@@ -35,28 +37,47 @@ public class Folder implements FileObject{
         private FileObject directObject;
 
         //con
-        Component(String name, String sha1, FolderType type, String lastUpdater, String lastUpdateDate){
+        Component(String name, String sha1, FolderType type, String lastUpdater, String lastUpdateDate) {
 
-            this.type= type;
-            this.name=name;
-            this.lastUpdateDate=lastUpdateDate.toString();
-            this.Sha1=sha1;
-            this.lastUpdater=lastUpdater;
+            this.type = type;
+            this.name = name;
+            this.lastUpdateDate = lastUpdateDate.toString();
+            this.Sha1 = sha1;
+            this.lastUpdater = lastUpdater;
 
         }       // from text/xml file
 
 
         //get\set
-        public FileObject getDirectObject() { return directObject; }
-        void setDirectObject(FileObject directObject) { this.directObject = directObject; }
 
-        FolderType getComponentType() {return type;}
 
-        String getComponentSHA1() { return Sha1;}
-        public void setSha1(String sha1) { Sha1 = sha1; }
-        String  getComponentName() {return name;}
+        public FileObject getDirectObject() {
+            return directObject;
+        }
 
-        String  getFolderSHA1() {return Sha1;}
+        void setDirectObject(FileObject directObject) {
+            this.directObject = directObject;
+        }
+
+        FolderType getComponentType() {
+            return type;
+        }
+
+        String getComponentSHA1() {
+            return Sha1;
+        }
+
+        public void setSha1(String sha1) {
+            Sha1 = sha1;
+        }
+
+        String getComponentName() {
+            return name;
+        }
+
+        String getFolderSHA1() {
+            return Sha1;
+        }
 
         //methods
         //comperator
@@ -80,10 +101,9 @@ public class Folder implements FileObject{
 
         }
 
-       static Component getComponentFromString  (String s)
-        {
-            String[] st =  s.split(",");
-            Component c = new Component(st[0],st[1],getTypeFromString(st[2]),st[3], st[4]);
+        static Component getComponentFromString(String s) {
+            String[] st = s.split(",");
+            Component c = new Component(st[0], st[1], getTypeFromString(st[2]), st[3], st[4]);
             return c;
         }
 
@@ -102,18 +122,24 @@ public class Folder implements FileObject{
     }
 
     //set\get
-    public void setComponents(ArrayList<Component> components) { this.components = components; }
-    ArrayList<Component> getComponents() { return this.components; }
+
+    public boolean isRoot() {
+        return isRoot;
+    }
+
+    public void setComponents(ArrayList<Component> components) {
+        this.components = components;
+    }
+
+    ArrayList<Component> getComponents() {
+        return this.components;
+    }
 
     //methods
-   static FolderType getTypeFromString(String s)
-    {
-        if("Folder".equals(s))
-        {
+    static FolderType getTypeFromString(String s) {
+        if ("Folder".equals(s)) {
             return FolderType.Folder;
-        }
-        else
-        {
+        } else {
             return FolderType.Blob;
         }
     }
@@ -127,7 +153,6 @@ public class Folder implements FileObject{
         }
         return content.toString();
     }
-
 
 
     ArrayList<Component> setComponentsFromString(String compomemtString) throws IOException {
@@ -146,7 +171,7 @@ public class Folder implements FileObject{
     String getFolderContentString() {
         StringBuilder sb = new StringBuilder();
 
-        for(Component c: components) {
+        for (Component c : components) {
             sb.append(c.getComponentsStringFromComponent());
             sb.append(System.lineSeparator());
         }
@@ -155,37 +180,43 @@ public class Folder implements FileObject{
         return sb.toString();
     }
 
-    public static Map<String, Component>  getAllBlobsToMap(MagitBlobs blobs)
-    {
-       List<MagitBlob> oldlist = blobs.getMagitBlob();
-        Map<String,Component> newMap = new HashMap<>();
-        for(MagitBlob blob: oldlist)
-        {
+    public static Map<String, Component> getAllBlobsToMap(MagitBlobs blobs) {
+        List<MagitBlob> oldlist = blobs.getMagitBlob();
+        Map<String, Component> newMap = new HashMap<>();
+        for (MagitBlob blob : oldlist) {
             String sha1 = GitManager.generateSHA1FromString(blob.getContent());
-            Component c = new Component(blob.getName(),sha1,FolderType.Blob,blob.getLastUpdater(),blob.getLastUpdateDate());
-            newMap.put(blob.getId(),c);
-            Blob b = new Blob(blob.getContent());
-            c.setDirectObject(b);
+            Component c = new Component(blob.getName(), sha1, FolderType.Blob, blob.getLastUpdater(), blob.getLastUpdateDate());
+            if (!newMap.containsKey(blob.getId())) {
+                newMap.put(blob.getId(), c);
+                Blob b = new Blob(blob.getContent());
+                c.setDirectObject(b);
+            } else {
+                //return exception key already exist
+            }
         }
         return newMap;
     }
 
-    public static Map<String, Component>  getAllFoldersToMap(MagitFolders folders)
-    {
+    public static Map<String, Component> getAllFoldersToMap(MagitFolders folders) {
         List<MagitSingleFolder> oldlist = folders.getMagitSingleFolder();
-        Map<String,Component> newMap = new HashMap<>();
-        for(MagitSingleFolder folder: oldlist)
-        {
+        Map<String, Component> newMap = new HashMap<>();
+        for (MagitSingleFolder folder : oldlist) {
             //String sha1 = GitManager.generateSHA1FromString(folder);
-            Component c = new Component(folder.getName(),null,FolderType.Folder,folder.getLastUpdater(),folder.getLastUpdateDate());
-            newMap.put(folder.getId(),c);
-            //Folder f = new Folder(f.getContent());
-            //c.setDirectObject(b);
+            Component c = new Component(folder.getName(), null, FolderType.Folder, folder.getLastUpdater(), folder.getLastUpdateDate());
+            if (!newMap.containsKey(folder.getId())) {
+                newMap.put(folder.getId(), c);
+                //Folder f = new Folder(f.getContent());
+                //c.setDirectObject(b);
+            } else {
+                //return exception key already exist
+
+            }
         }
         return newMap;
 
     }
-    public static void createListOfComponents( Map<String,Component> folderList,Map<String,Component> blobList,MagitFolders folders)//create list of component to each folder
+
+    public static void createListOfComponents(Map<String, Component> folderList, Map<String, Component> blobList, MagitFolders folders)//create list of component to each folder
     {
         List<MagitSingleFolder> oldlist = folders.getMagitSingleFolder();
         for (MagitSingleFolder f : oldlist) {
@@ -193,20 +224,38 @@ public class Folder implements FileObject{
             folder.components = new ArrayList<>();
             for (Item i : f.getItems().getItem()) {
                 if (i.getType().equals("folder")) {
-                    folder.components.add(folderList.get(i.getId()));
+                    if(folderList.containsKey(i.getId())) {
+                        if(f.getId() != i.getId()) {
+                            folder.components.add(folderList.get(i.getId()));
+                        }
+                        else {
+                            //return folder is inside itself
+                        }
+                    }
+                    else
+                        {
+                            //return exception id not exit
+                        }
                 } else {
-                    folder.components.add(blobList.get(i.getId()));
+                    if(blobList.containsKey(i.getId())) {
+                        folder.components.add(blobList.get(i.getId()));
+                    }
+                    else
+                    {
+                        //return exception id not exit
+                    }
                 }
             }
+            folder.isRoot = f.isIsRoot();
             folderList.get(f.getId()).setDirectObject(folder);
         }
     }
 
-
+}
 //    public void exportToFile() // check if the sha1 exist
 //    {
 //
 //    }
-}
+
 
 

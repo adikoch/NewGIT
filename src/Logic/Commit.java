@@ -101,24 +101,36 @@ public class Commit {
         SHA1 = GitManager.generateSHA1FromString(s.toString());
         SHAContent = s.toString();
     }
-    public static Map<String, Commit> getAllCommitsToMap(MagitCommits commits, Map<String, Folder.Component> folderList)
-    {
+    public static Map<String, Commit> getAllCommitsToMap(MagitCommits commits, Map<String, Folder.Component> folderList) {
         Map<String, Commit> newMap = new HashMap<>();
         List<MagitSingleCommit> commitlist = commits.getMagitSingleCommit();
-        for(MagitSingleCommit c: commitlist)
-        {
+        for (MagitSingleCommit c : commitlist) {
             ArrayList<String> args = new ArrayList<>();
             String rootFolderID = c.getRootFolder().getId();
-            String rootFolderSHA1 = folderList.get(rootFolderID).getFolderSHA1();
-            args.add(0,rootFolderSHA1);
-            args.add(1,null);
-            args.add(2,null);
-            args.add(3,c.getMessage());
-            args.add(4,c.getDateOfCreation());
-            args.add(5,c.getAuthor());
-            Commit newcommit = new Commit(args);
-            newMap.put(c.getId(),newcommit);
-            newcommit.setRootFolder((Folder)folderList.get(rootFolderID).getDirectObject());
+            Folder curFolder = (Folder) folderList.get(rootFolderID).getDirectObject();
+            if (folderList.containsKey(rootFolderID)) {
+                if (curFolder.isRoot()) {
+                    String rootFolderSHA1 = folderList.get(rootFolderID).getFolderSHA1();
+                    args.add(0, rootFolderSHA1);
+                    args.add(1, null);
+                    args.add(2, null);
+                    args.add(3, c.getMessage());
+                    args.add(4, c.getDateOfCreation());
+                    args.add(5, c.getAuthor());
+                    Commit newcommit = new Commit(args);
+                    if (!newMap.containsKey(c.getId())) {
+                        newMap.put(c.getId(), newcommit);
+                        newcommit.setRootFolder(curFolder);
+                    } else {
+                        //return exception id already exit
+                    }
+                } else {
+                    //return folder is not isroot
+                }
+            } else {
+                //return root folder does not exist
+            }
+
         }
         return newMap;
     }

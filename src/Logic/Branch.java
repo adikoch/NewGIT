@@ -46,8 +46,14 @@ public class Branch {
         for(MagitSingleBranch c: brancheslist)
         {
             Branch b = new Branch(c.getName());
-            b.setPointedCommit(commits.get(c.getPointedCommit().getId()));
-            newbranches.add(b);
+            if(commits.containsKey(c.getPointedCommit().getId())) {
+                b.setPointedCommit(commits.get(c.getPointedCommit().getId()));
+                newbranches.add(b);
+            }
+            else
+            {
+                //return commit does not exist
+            }
         }
         return newbranches;
     }

@@ -733,12 +733,13 @@ public class GitManager {
         GITRepository = new Repository(Paths.get(oldRepository.getLocation()));
         convertOldRepoToNew(oldRepository);
         createFilesInWCFromCommitObject(GITRepository.getHeadBranch().getPointedCommit().getRootFolder(), GITRepository.getRepositoryPath());
+        createMagitFiles();
 
     }
 
     public void convertOldRepoToNew(MagitRepository oldRepository) throws Exception{
 
-        checkValidation(oldRepository);
+//        checkValidation(oldRepository);
         GITRepository.insertMembersToNewRepository(oldRepository);
         blobMap = Folder.getAllBlobsToMap(oldRepository.getMagitBlobs());
         folderMap = Folder.getAllFoldersToMap(oldRepository.getMagitFolders());
@@ -752,8 +753,14 @@ public class GitManager {
 
         GITRepository.setBranches(Branch.getAllBranchesToMap(oldRepository.getMagitBranches(), commitMap));    //add all branched to branches list in repository
 
-        GITRepository.setHeadBranch(GITRepository.getBranchByName(oldRepository.getMagitBranches().getHead()));//set head
-        createMagitFiles();
+        if(GITRepository.getBranchByName(oldRepository.getMagitBranches().getHead()) != null) {
+            GITRepository.setHeadBranch(GITRepository.getBranchByName(oldRepository.getMagitBranches().getHead()));//set head
+
+        }
+        else {
+            //return head branch does not exist
+        }
+
 
     }
 
@@ -769,10 +776,10 @@ public class GitManager {
         if (c.getPrecedingCommits() == null || (commitMap.get(c.getPrecedingCommits().getPrecedingCommit().get(0).getId()).getSHA() != null))
         //&& commitList.get(c.getPrecedingCommits().getPrecedingCommit().get(0).getId()).getSHA1anotherPreveiousCommit() != null))
         {
-            commitMap.get(c.getId()).setCommitFileContentToSHA();
             if (c.getPrecedingCommits() != null) {
                 commitMap.get((c.getId())).setSHA1PreveiousCommit(commitMap.get(c.getPrecedingCommits().getPrecedingCommit().get(0).getId()).getSHA());
             }
+            commitMap.get(c.getId()).setCommitFileContentToSHA();
             return;
         }
         MagitSingleCommit commit = getMagitCommit(c.getPrecedingCommits().getPrecedingCommit().get(0).getId(), oldList);
@@ -810,7 +817,7 @@ public class GitManager {
     }
 
     public void createBranchesFiles() throws Exception {
-        Path BranchesPath = Paths.get(GITRepository.getRepositoryPath().toString() + "\\.magit\\Objects");
+        Path BranchesPath = Paths.get(GITRepository.getRepositoryPath().toString() + "\\.magit\\Branches");
         for (Branch b : GITRepository.getBranches()) {
             createFileInMagit(b, GITRepository.getRepositoryPath());
         }
@@ -824,75 +831,79 @@ public class GitManager {
     }
 
     public void createBlobs() throws Exception {
-        Path ObjectPath = Paths.get(GITRepository.getRepositoryPath().toString() + "\\.magit\\Objects");
+//        Path ObjectPath = Paths.get(GITRepository.getRepositoryPath().toString() + "\\.magit\\Objects");
 
         Iterator entries = blobMap.entrySet().iterator();
         while (entries.hasNext()) {
             Map.Entry thisEntry = (Map.Entry) entries.next();
             Folder.Component c = (Folder.Component) thisEntry.getValue();
             Blob b = (Blob) c.getDirectObject();
-            createFileInMagit(b,ObjectPath);
+            createFileInMagit(b,GITRepository.getRepositoryPath());
         }
 
     }
 
     public void createFolders() throws Exception {
-        Path ObjectPath = Paths.get(GITRepository.getRepositoryPath().toString() + "\\.magit\\Objects");
+//        Path ObjectPath = Paths.get(GITRepository.getRepositoryPath().toString() + "\\.magit\\Objects");
 
         Iterator entries = folderMap.entrySet().iterator();
         while (entries.hasNext()) {
             Map.Entry thisEntry = (Map.Entry) entries.next();
             Folder.Component c = (Folder.Component) thisEntry.getValue();
             Folder f = (Folder) c.getDirectObject();
-            createFileInMagit(f, ObjectPath);
+            createFileInMagit(f, GITRepository.getRepositoryPath());
         }
     }
 
     public void createCommits() throws Exception {
-        Path ObjectPath = Paths.get(GITRepository.getRepositoryPath().toString() + "\\.magit\\Objects");
+//        Path ObjectPath = Paths.get(GITRepository.getRepositoryPath().toString() + "\\.magit\\Objects");
 
         Iterator entries = commitMap.entrySet().iterator();
         while (entries.hasNext()) {
             Map.Entry thisEntry = (Map.Entry) entries.next();
             Commit c = (Commit) thisEntry.getValue();
-            createFileInMagit(c,ObjectPath);
+            createFileInMagit(c,GITRepository.getRepositoryPath());
         }
     }
-    public void checkValidation(MagitRepository oldRepository)
-    {
-        isFileXML();//1
-        isTwoIdentifiedID();//2
-        isBlobOrFolderRelateToFolder();//3+4+5
-        isRootFolder();//6
-        isBranchCommitExist();//7
-        isHeadBranchExist();//8
-
-
-    }
-    public void isFileXML()//1
-    {
-
-    }
-    public void isTwoIdentifiedID()//2
-    {
-
-    }
-    public void  isBlobOrFolderRelateToFolder()//3+4+5
-    {
-
-    }
-    public void isRootFolder()//6
-    {
-
-    }
-    public void  isBranchCommitExist()//7
-    {
-
-    }
-    public void isHeadBranchExist()//8
-    {
-
-    }
+//    public void checkValidation(MagitRepository oldRepository)
+//    {
+//        isFileXML();//1
+//        isTwoIdentifiedID(oldRepository);//2
+//        isBlobOrFolderRelateToFolder();//3+4+5
+//        isRootFolder();//6
+//        isBranchCommitExist();//7
+//        isHeadBranchExist();//8
+//
+//
+//    }
+//    public void isFileXML()//1
+//    {
+//
+//    }
+//    public void isTwoIdentifiedID(MagitRepository repo)//2
+//    {
+//        Iterator entries = commitMap.entrySet().iterator();
+//        while (entries.hasNext()) {
+//            Map.Entry thisEntry = (Map.Entry) entries.next();
+//            Commit c = (Commit) thisEntry.getValue();
+//        }
+//    }
+//    public void  isBlobOrFolderRelateToFolder()//3+4+5
+//    {
+//
+//    }
+//    public void isRootFolder()//6
+//    {
+//
+//    }
+//    public void  isBranchCommitExist()//7
+//    {
+//
+//    }
+//    public void isHeadBranchExist()//8
+//    {
+//
+//    }
 }
 
 //אקספשנים
