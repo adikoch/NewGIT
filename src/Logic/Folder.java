@@ -5,8 +5,10 @@ import jaxb.schema.generated.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
-public class Folder implements FileObject {
+public class Folder implements FileObject{
 
     //members
     private ArrayList<Component> components;
@@ -155,6 +157,7 @@ public class Folder implements FileObject {
     }
 
 
+
     ArrayList<Component> setComponentsFromString(String compomemtString) throws IOException {
         BufferedReader br = new BufferedReader(new StringReader(compomemtString));
         ArrayList<Component> st = new ArrayList<>();
@@ -233,9 +236,9 @@ public class Folder implements FileObject {
                         }
                     }
                     else
-                        {
-                            //return exception id not exit
-                        }
+                    {
+                        //return exception id not exit
+                    }
                 } else {
                     if(blobList.containsKey(i.getId())) {
                         folder.components.add(blobList.get(i.getId()));
@@ -256,6 +259,5 @@ public class Folder implements FileObject {
 //    {
 //
 //    }
-
 
 
