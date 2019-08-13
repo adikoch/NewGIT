@@ -764,7 +764,6 @@ public class GitManager {
         GITRepository = new Repository(Paths.get(oldRepository.getLocation()));
         convertOldRepoToNew(oldRepository);
         createFilesInWCFromCommitObject(GITRepository.getHeadBranch().getPointedCommit().getRootFolder(), GITRepository.getRepositoryPath());
-        createMagitFiles();
 
     }
 
@@ -786,6 +785,7 @@ public class GitManager {
 
         if(GITRepository.getBranchByName(oldRepository.getMagitBranches().getHead()) != null) {
             GITRepository.setHeadBranch(GITRepository.getBranchByName(oldRepository.getMagitBranches().getHead()));//set head
+            createMagitFiles();
 
         }
         else {
