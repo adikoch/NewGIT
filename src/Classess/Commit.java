@@ -1,7 +1,7 @@
-package Logic;
+package Classess;
 
-import jaxb.schema.generated.MagitCommits;
-import jaxb.schema.generated.MagitSingleCommit;
+
+import jaxb.schema.generated.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;

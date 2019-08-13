@@ -1,4 +1,4 @@
-package Logic;
+package Classess;
 
 public interface FileObject {
 //    String SHA1 = "";

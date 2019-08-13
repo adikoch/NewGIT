@@ -1,6 +1,6 @@
-package Logic;
+package Classess;
 
-import jaxb.schema.generated.MagitRepository;
+import jaxb.schema.generated.*;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;

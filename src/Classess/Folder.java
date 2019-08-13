@@ -1,12 +1,12 @@
-package Logic;
+package Classess;
+
+
 
 import jaxb.schema.generated.*;
-
 
 import java.io.*;
 import java.util.*;
 import java.util.ArrayList;
-import java.util.List;
 
 public class Folder implements FileObject{
 
